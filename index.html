@@ -1,0 +1,2961 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FLOKS'IX</title>
+
+  <!-- PWA & Mobile / Fire TV Meta -->
+  <meta name="theme-color" content="#141414" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FLOKS'IX" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Inter & Bebas Neue -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --nf-bg: #141414;
+      --nf-surface: #181818;
+      --nf-red: #E50914;
+      --nf-red-hover: #f40612;
+      --nf-green: #46d369;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--nf-bg);
+      color: #ffffff;
+      font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+    }
+
+    .font-display {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-logo {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      color: var(--nf-red);
+      letter-spacing: 0.06em;
+      text-shadow: 0 2px 16px rgba(229, 9, 20, 0.35);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Hero cinematic vignettes */
+    .hero-grad-bottom {
+      background: linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(20,20,20,0.28) 48%, rgba(20,20,20,0.88) 84%, #141414 100%);
+    }
+    .hero-grad-left {
+      background: linear-gradient(90deg, #141414 0%, rgba(20,20,20,0.85) 26%, rgba(20,20,20,0.35) 54%, rgba(20,20,20,0) 80%);
+    }
+    .hero-grad-top {
+      background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    /* Netflix Card Hover & TV Focus */
+    .nf-card {
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s ease;
+      will-change: transform;
+    }
+    .nf-card:hover,
+    .nf-card.tv-focus {
+      transform: scale(1.08);
+      z-index: 30;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.92), 0 0 0 2px rgba(255, 255, 255, 0.88);
+    }
+    .nf-card .card-hover-info {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .nf-card:hover .card-hover-info,
+    .nf-card.tv-focus .card-hover-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tv-focus-btn {
+      outline: none !important;
+      box-shadow: 0 0 0 3px #ffffff, 0 0 24px rgba(255, 255, 255, 0.35) !important;
+      transform: scale(1.04);
+    }
+
+    .profile-tile:hover .profile-avatar,
+    .profile-tile.tv-focus-profile .profile-avatar {
+      border-color: #ffffff;
+      transform: scale(1.05);
+    }
+    .profile-tile:hover .profile-name,
+    .profile-tile.tv-focus-profile .profile-name {
+      color: #ffffff;
+    }
+
+    /* Carousel navigation arrows */
+    .row-wrapper:hover .row-arrow {
+      opacity: 1;
+    }
+
+    /* Dropzone: guarantee 100% surface click & drag */
+    .dropzone-area * {
+      pointer-events: none;
+    }
+    .dropzone-dragover {
+      border-color: #E50914 !important;
+      background-color: rgba(229, 9, 20, 0.14) !important;
+    }
+
+    /* Animations */
+    @keyframes shakePin {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-9px); }
+      40% { transform: translateX(9px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+    .animate-shake { animation: shakePin 0.36s ease-in-out; }
+
+    @keyframes tudumFlash {
+      0% { opacity: 0; transform: scale(0.86); }
+      25% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1.06); }
+      100% { opacity: 0; transform: scale(1.65); }
+    }
+    .animate-tudum { animation: tudumFlash 1.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+  </style>
+</head>
+<body class="bg-[#141414] text-white min-h-screen antialiased selection:bg-[#E50914] selection:text-white">
+
+  <!-- =========================================================================
+       ÉCRAN 1 : SÉLECTION DE PROFIL ("QUI EST-CE ?")
+  ========================================================================== -->
+  <section id="screen-profiles" class="fixed inset-0 z-[90] bg-[#141414] flex flex-col items-center justify-center px-6">
+    <div class="absolute top-6 left-6 sm:left-12">
+      <span class="brand-logo text-3xl sm:text-4xl">FLOKS'IX</span>
+    </div>
+
+    <div class="max-w-3xl w-full text-center">
+      <h1 class="text-3xl sm:text-5xl font-medium tracking-tight text-white mb-10 sm:mb-12">Qui est-ce ?</h1>
+
+      <div id="profiles-grid" class="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+        <!-- Généré dynamiquement en JS -->
+      </div>
+
+      <p class="mt-12 text-xs text-neutral-500 tracking-wide">
+        Sélectionnez un profil pour lancer FLOKS'IX
+      </p>
+    </div>
+  </section>
+
+  <!-- OVERLAY ANIMATION TUDUM AU CLIC PROFIL -->
+  <div id="tudum-overlay" class="hidden fixed inset-0 z-[95] bg-black flex items-center justify-center pointer-events-none">
+    <div id="tudum-logo-wrap" class="flex flex-col items-center">
+      <div class="brand-logo text-7xl sm:text-9xl tracking-widest">FLOKS'IX</div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       BARRE DE NAVIGATION FIXE (NETFLIX STYLE)
+  ========================================================================== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-40 px-4 sm:px-12 py-3.5 flex items-center justify-between transition-colors duration-300 bg-gradient-to-b from-black/85 to-transparent">
+    <div class="flex items-center gap-5 sm:gap-9">
+      <!-- Logo FLOKS'IX (cliquer 5x = accès Admin PIN) -->
+      <button id="nav-brand-logo" class="brand-logo text-3xl sm:text-4xl leading-none focus:outline-none cursor-pointer" title="FLOKS'IX">
+        FLOKS'IX
+      </button>
+
+      <!-- Liens principaux -->
+      <div class="hidden md:flex items-center gap-5 text-[13px] lg:text-sm font-medium text-neutral-300">
+        <button data-nav="HOME" class="nav-link text-white font-semibold hover:text-neutral-200 transition">Accueil</button>
+        <button data-nav="Série" class="nav-link hover:text-white transition">Séries</button>
+        <button data-nav="Film" class="nav-link hover:text-white transition">Films</button>
+        <button data-nav="MYLIST" class="nav-link hover:text-white transition">Ma liste</button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 sm:gap-5">
+      <!-- Recherche en direct -->
+      <div id="search-box" class="relative flex items-center">
+        <button id="search-toggle-btn" class="p-1.5 text-neutral-200 hover:text-white transition" title="Rechercher">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <input id="search-input" type="text" placeholder="Titres, acteurs, genres..."
+               class="w-0 opacity-0 focus:w-44 sm:focus:w-64 focus:opacity-100 bg-black/85 border border-white/40 rounded px-3 py-1 text-xs sm:text-sm text-white placeholder-neutral-400 outline-none transition-all duration-300" />
+        <button id="search-clear-btn" class="hidden absolute right-2 text-neutral-400 hover:text-white text-xs">✕</button>
+      </div>
+
+      <!-- Menu Profil & accès discret Studio Admin -->
+      <div class="relative">
+        <button id="profile-menu-btn" class="flex items-center gap-2 focus:outline-none group">
+          <div id="nav-profile-avatar" class="w-8 h-8 rounded overflow-hidden flex items-center justify-center font-bold text-sm bg-[#E50914] text-white border border-white/20">
+            F
+          </div>
+          <svg class="w-3.5 h-3.5 text-neutral-300 group-hover:rotate-180 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </button>
+
+        <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-52 bg-black/95 border border-white/15 rounded-md shadow-2xl py-2 text-sm backdrop-blur-md">
+          <div class="px-4 py-2 border-b border-white/10">
+            <div class="text-[11px] text-neutral-400 uppercase tracking-wider">Profil actif</div>
+            <div id="dropdown-profile-name" class="font-semibold text-white">Floki</div>
+          </div>
+
+          <button id="btn-switch-profile" class="w-full px-4 py-2 text-left text-neutral-200 hover:bg-white/10 flex items-center gap-2.5 transition">
+            <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            Changer de profil
+          </button>
+
+          <button id="btn-replay-tudum" class="w-full px-4 py-2 text-left text-neutral-200 hover:bg-white/10 flex items-center gap-2.5 transition">
+            <svg class="w-4 h-4 text-[#E50914]" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            Son « Tudum »
+          </button>
+
+          <div class="border-t border-white/10 my-1"></div>
+
+          <button id="btn-menu-admin" class="w-full px-4 py-2 text-left text-neutral-400 hover:text-white hover:bg-white/10 flex items-center gap-2.5 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Studio Admin
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Barre mobile filtres rapides -->
+  <div id="mobile-nav-bar" class="md:hidden fixed top-14 left-0 right-0 z-30 px-4 py-2 flex items-center justify-center gap-5 text-xs font-medium text-neutral-300 bg-gradient-to-b from-black/70 to-transparent">
+    <button data-nav="HOME" class="nav-link text-white font-semibold">Accueil</button>
+    <button data-nav="Série" class="nav-link">Séries</button>
+    <button data-nav="Film" class="nav-link">Films</button>
+    <button data-nav="MYLIST" class="nav-link">Ma liste</button>
+  </div>
+
+  <!-- =========================================================================
+       CONTENU PRINCIPAL : HERO BANNER + CARROUSELS
+  ========================================================================== -->
+  <main id="app-main" class="pb-24 min-h-screen">
+    <!-- Hero Banner ("En vedette") -->
+    <header id="hero-banner" class="relative w-full h-[78vh] sm:h-[86vh] min-h-[520px] max-h-[860px] overflow-hidden flex items-end pb-16 sm:pb-24 px-5 sm:px-12">
+      <div id="hero-media" class="absolute inset-0"></div>
+      <div class="hero-grad-top absolute top-0 left-0 right-0 h-28 pointer-events-none"></div>
+      <div class="hero-grad-left absolute inset-0 pointer-events-none"></div>
+      <div class="hero-grad-bottom absolute inset-0 pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl">
+        <div id="hero-original-row" class="flex items-center gap-2 mb-2.5">
+          <span class="font-display text-2xl sm:text-3xl text-[#E50914] leading-none">F</span>
+          <span id="hero-original-text" class="text-[11px] sm:text-xs font-bold tracking-[0.3em] text-neutral-200 uppercase">SÉRIE ORIGINALE FLOKS'IX</span>
+        </div>
+
+        <h1 id="hero-title" class="font-display text-5xl sm:text-7xl md:text-8xl leading-[0.92] text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] mb-4">
+          SHERLOCK
+        </h1>
+
+        <div id="hero-meta" class="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-medium mb-4"></div>
+
+        <p id="hero-synopsis" class="text-sm sm:text-base md:text-[17px] text-neutral-200 leading-relaxed line-clamp-3 mb-7 drop-shadow max-w-xl"></p>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button id="hero-play-btn" class="flex items-center gap-2.5 bg-white text-black hover:bg-white/85 font-bold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded transition">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Lecture
+          </button>
+          <button id="hero-info-btn" class="flex items-center gap-2.5 bg-neutral-500/55 hover:bg-neutral-500/40 backdrop-blur-sm text-white font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Plus d'infos
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Résultats de recherche ou vue filtrée -->
+    <section id="search-results-section" class="hidden pt-24 px-5 sm:px-12 pb-12">
+      <h2 id="search-results-title" class="text-xl sm:text-2xl font-bold text-white mb-6"></h2>
+      <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+    </section>
+
+    <!-- Carrousels des catégories -->
+    <section id="rows-container" class="relative z-10 -mt-10 sm:-mt-14 space-y-8 sm:space-y-10"></section>
+
+    <!-- Pied de page discret Netflix -->
+    <footer class="mt-20 px-5 sm:px-12 pt-10 border-t border-white/5 text-xs text-neutral-500 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="brand-logo text-xl opacity-80">FLOKS'IX</span>
+        <span>Plateforme privée de streaming • Édition Collector</span>
+      </div>
+      <div>Raccourcis TV : Flèches • Entrée • Échap</div>
+    </footer>
+  </main>
+
+  <!-- =========================================================================
+       MODALE "PLUS D'INFOS" (FIDÈLE À NETFLIX — 2 COLONNES + CAST)
+  ========================================================================== -->
+  <div id="modal-detail" class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm overflow-y-auto flex justify-center items-start p-2 sm:p-8">
+    <div class="relative w-full max-w-[860px] bg-[#181818] rounded-xl overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.95)] my-6 border border-white/10">
+      <button id="detail-close-btn" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-[#181818]/90 hover:bg-white hover:text-black text-white flex items-center justify-center transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Aperçu 16:9 en haut -->
+      <div class="relative w-full aspect-video max-h-[440px] overflow-hidden flex items-end p-6 sm:p-10">
+        <div id="detail-backdrop" class="absolute inset-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/35 to-transparent"></div>
+        <div class="relative z-10 w-full">
+          <div id="detail-original-badge" class="hidden flex items-center gap-1.5 mb-2">
+            <span class="font-display text-2xl text-[#E50914] leading-none">F</span>
+            <span id="detail-original-label" class="text-[11px] font-bold tracking-[0.26em] text-neutral-200 uppercase">ORIGINAL FLOKS'IX</span>
+          </div>
+          <h2 id="detail-title" class="font-display text-4xl sm:text-6xl text-white drop-shadow mb-5"></h2>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button id="detail-play-btn" class="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 font-bold text-sm sm:text-base px-7 py-2.5 rounded transition">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              Lecture
+            </button>
+            <button id="detail-mylist-btn" class="flex items-center gap-2 bg-neutral-700/70 hover:bg-neutral-600/80 border border-white/30 text-white font-semibold text-sm px-5 py-2.5 rounded transition">
+              <span id="detail-mylist-icon">+</span>
+              <span id="detail-mylist-text">Ma liste</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Corps 2 colonnes -->
+      <div class="px-6 sm:px-10 pb-10 pt-4 grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8">
+        <!-- Colonne gauche : Méta + Synopsis -->
+        <div class="md:col-span-8 space-y-4">
+          <div id="detail-meta" class="flex flex-wrap items-center gap-2.5 text-sm font-medium"></div>
+          <p id="detail-synopsis" class="text-neutral-200 text-sm sm:text-[15px] leading-relaxed"></p>
+        </div>
+
+        <!-- Colonne droite : Distribution, Genres, Catégorie, Ambiance -->
+        <div class="md:col-span-4 space-y-3 text-xs sm:text-[13px] leading-relaxed">
+          <div>
+            <span class="text-neutral-500">Distribution : </span>
+            <span id="detail-cast" class="text-neutral-200"></span>
+          </div>
+          <div>
+            <span class="text-neutral-500">Genres : </span>
+            <span id="detail-genres" class="text-neutral-200"></span>
+          </div>
+          <div>
+            <span class="text-neutral-500">Catégorie : </span>
+            <span id="detail-category" class="text-neutral-200"></span>
+          </div>
+          <div>
+            <span class="text-neutral-500">Ce programme est : </span>
+            <span id="detail-tags" class="text-neutral-200"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       LECTEUR VIDÉO PLEIN ÉCRAN (HTML5 MP4 DEPUIS R2)
+  ========================================================================== -->
+  <section id="modal-player" class="hidden fixed inset-0 z-[80] bg-black flex flex-col items-center justify-center">
+    <div class="absolute top-0 left-0 right-0 z-20 p-4 sm:p-6 flex items-center justify-between bg-gradient-to-b from-black/85 to-transparent">
+      <button id="player-close-btn" class="flex items-center gap-3 text-white hover:text-neutral-300 font-semibold transition">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span id="player-title" class="text-base sm:text-xl font-bold"></span>
+      </button>
+      <span class="text-[11px] font-mono text-neutral-300 bg-black/60 border border-white/20 px-2.5 py-1 rounded">FLOKS'IX HD</span>
+    </div>
+
+    <video id="video-element" class="w-full h-full max-h-screen object-contain bg-black" controls playsinline></video>
+
+    <!-- Écran cinéma si aucune vidéo n'est encore liée -->
+    <div id="player-placeholder" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-[radial-gradient(ellipse_at_center,_#240608_0%,_#080808_70%)]">
+      <div class="brand-logo text-6xl sm:text-7xl mb-4">FLOKS'IX</div>
+      <h3 id="player-placeholder-title" class="font-display text-3xl sm:text-4xl text-white mb-2"></h3>
+      <p class="text-neutral-300 text-sm sm:text-base max-w-md mb-8">
+        Épisode / Bande-annonce bientôt disponible sur FLOKS'IX.
+      </p>
+      <button id="player-placeholder-close" class="px-7 py-2.5 rounded bg-white text-black font-bold text-sm hover:bg-neutral-200 transition">
+        Retour au catalogue
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MODALE CODE PIN ADMIN (9999)
+  ========================================================================== -->
+  <div id="modal-pin" class="hidden fixed inset-0 z-[92] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+    <div class="max-w-sm w-full bg-[#181818] border border-white/15 rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-[11px] uppercase tracking-[0.25em] text-[#E50914] font-bold mb-2">Studio Admin FLOKS'IX</div>
+      <h2 class="text-xl font-bold text-white mb-1">Code PIN requis</h2>
+      <p id="pin-error" class="h-5 text-xs text-[#E50914] font-medium mb-4"></p>
+
+      <div id="pin-boxes" class="flex justify-center gap-3 mb-6">
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+      </div>
+
+      <div id="pin-keypad" class="grid grid-cols-3 gap-2.5 mb-5"></div>
+
+      <button id="pin-cancel-btn" class="text-xs uppercase tracking-widest text-neutral-400 hover:text-white transition">
+        Annuler (Échap)
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       STUDIO ADMIN (3 ONGLETS : CATALOGUE | CATÉGORIES | CLOUDFLARE R2)
+  ========================================================================== -->
+  <section id="modal-admin" class="hidden fixed inset-0 z-[96] bg-[#0d0d0d] text-white overflow-y-auto">
+    <!-- Header Admin -->
+    <header class="sticky top-0 z-30 bg-[#141414]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span class="brand-logo text-2xl sm:text-3xl leading-none">FLOKS'IX</span>
+          <span class="text-xs font-bold tracking-[0.2em] uppercase text-neutral-300 border-l border-white/20 pl-3">STUDIO ADMIN</span>
+        </div>
+
+        <!-- Onglets -->
+        <div class="flex items-center bg-[#1f1f1f] p-1 rounded-lg border border-white/10 text-xs sm:text-sm font-semibold">
+          <button data-admin-tab="titles" class="admin-tab-btn px-3.5 py-1.5 rounded-md bg-[#E50914] text-white transition">Catalogue</button>
+          <button data-admin-tab="categories" class="admin-tab-btn px-3.5 py-1.5 rounded-md text-neutral-300 hover:text-white transition">Catégories</button>
+          <button data-admin-tab="tools" class="admin-tab-btn px-3.5 py-1.5 rounded-md text-neutral-300 hover:text-white transition">Cloudflare R2</button>
+        </div>
+
+        <button id="admin-close-btn" class="bg-white text-black hover:bg-neutral-200 font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition">
+          Fermer
+        </button>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-6 pb-24">
+
+      <!-- =====================================
+           ONGLET 1 : CATALOGUE (TITRES)
+      ====================================== -->
+      <div id="admin-panel-titles" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Colonne gauche : Recherche + Liste -->
+        <aside class="lg:col-span-4 bg-[#161616] border border-white/10 rounded-xl p-4 flex flex-col max-h-[82vh]">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-neutral-300">
+              Titres (<span id="admin-titles-count">0</span>)
+            </h2>
+            <button id="btn-new-title" class="bg-[#E50914] hover:bg-[#f40612] text-white text-xs font-bold px-3 py-1.5 rounded-md transition">
+              + Nouveau titre
+            </button>
+          </div>
+
+          <input id="admin-title-search" type="text" placeholder="Filtrer les titres..."
+                 class="w-full mb-3 bg-[#222] border border-white/10 focus:border-[#E50914] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+
+          <div id="admin-titles-list" class="space-y-1.5 overflow-y-auto pr-1 flex-1"></div>
+        </aside>
+
+        <!-- Colonne droite : Formulaire complet -->
+        <div class="lg:col-span-8 bg-[#161616] border border-white/10 rounded-xl p-5 sm:p-6">
+          <form id="admin-title-form" class="space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3.5">
+              <h2 id="form-title-heading" class="text-lg font-bold text-white">Nouveau titre</h2>
+              <div id="delete-title-wrap" class="hidden flex items-center gap-2">
+                <button type="button" id="btn-delete-title" class="px-3 py-1.5 rounded-lg bg-red-950/70 hover:bg-[#E50914] border border-red-500/40 text-red-200 hover:text-white text-xs font-bold transition">
+                  Supprimer ce titre
+                </button>
+                <button type="button" id="btn-confirm-delete-title" class="hidden px-3 py-1.5 rounded-lg bg-[#E50914] text-white text-xs font-bold animate-pulse">
+                  Confirmer la suppression ?
+                </button>
+              </div>
+            </div>
+
+            <input type="hidden" id="f-id" />
+
+            <!-- Ligne 1 : Titre + Type -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <div class="sm:col-span-8">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Titre *</label>
+                <input id="f-title" type="text" required placeholder="Ex : SHERLOCK"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+              </div>
+              <div class="sm:col-span-4">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Type</label>
+                <select id="f-type" class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none">
+                  <option value="Série">Série</option>
+                  <option value="Film">Film</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Ligne 2 : Année, Durée, Match %, Classification -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Année</label>
+                <input id="f-year" type="number" value="2026" min="1950" max="2035"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-sm text-white outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Durée / Saisons</label>
+                <input id="f-duration" type="text" value="1 saison" placeholder="2 h 10 min"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-sm text-white outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">% Recommandé</label>
+                <input id="f-match" type="number" value="98" min="50" max="100"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-sm text-white outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Classification</label>
+                <select id="f-rating" class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-sm text-white outline-none">
+                  <option value="Tous publics">Tous publics</option>
+                  <option value="10+">10+</option>
+                  <option value="13+">13+</option>
+                  <option value="16+" selected>16+</option>
+                  <option value="18+">18+</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Ligne 3 : Catégorie + Checkboxes -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center bg-[#1c1c1c] p-3.5 rounded-xl border border-white/10">
+              <div class="sm:col-span-5">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Catégorie</label>
+                <select id="f-category" class="w-full bg-[#262626] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-sm text-white outline-none"></select>
+              </div>
+              <div class="sm:col-span-7 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 pt-2 sm:pt-4">
+                <label class="flex items-center gap-2 cursor-pointer text-xs sm:text-sm font-medium">
+                  <input id="f-featured" type="checkbox" class="w-4 h-4 accent-[#E50914]" />
+                  <span class="text-amber-400 font-semibold">★ En vedette (Hero)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-xs sm:text-sm font-medium">
+                  <input id="f-original" type="checkbox" class="w-4 h-4 accent-[#E50914]" />
+                  <span class="text-[#E50914] font-semibold">Badge Original FLOKS'IX</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Ligne 4 : Distribution (Acteurs/Actrices), Genres, Ambiance/Tags -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Acteurs / Actrices (Distribution, séparés par des virgules)</label>
+                <input id="f-cast" type="text" placeholder="Ex : Vivien Azzam, Teva, Floki"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Genres</label>
+                <input id="f-genres" type="text" placeholder="Ex : Policier, Mystère, Britannique"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Ambiance / Tags ("Ce programme est...")</label>
+                <input id="f-tags" type="text" placeholder="Ex : Haletant, Cérébral, Sombre"
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+              </div>
+            </div>
+
+            <!-- Synopsis -->
+            <div>
+              <label class="block text-[11px] font-semibold uppercase tracking-wider text-neutral-400 mb-1">Synopsis</label>
+              <textarea id="f-synopsis" rows="3" placeholder="Synopsis complet du film ou de la série..."
+                        class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2 text-sm text-white outline-none resize-y"></textarea>
+            </div>
+
+            <!-- Médias : Affiche Verticale 2:3 & Bannière Horizontale 16:9 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Affiche 2:3 -->
+              <div class="space-y-2">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-300">Affiche Verticale (2:3)</label>
+                <input id="file-poster" type="file" accept="image/*" class="hidden" />
+                <div id="dz-poster" class="dropzone-area border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-3 text-center cursor-pointer transition bg-[#1c1c1c]">
+                  <div id="prev-poster" class="w-24 aspect-[2/3] mx-auto rounded-md overflow-hidden bg-black/60 mb-2 flex items-center justify-center border border-white/10">
+                    <span class="text-[11px] text-neutral-500">2:3</span>
+                  </div>
+                  <p id="stat-poster" class="text-xs text-neutral-300">Cliquer ou glisser une affiche 2:3</p>
+                </div>
+                <input id="f-posterUrl" type="url" placeholder="URL R2 affiche verticale..."
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-1.5 text-xs text-white outline-none" />
+              </div>
+
+              <!-- Bannière 16:9 -->
+              <div class="space-y-2">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-300">Bannière Horizontale (16:9)</label>
+                <input id="file-banner" type="file" accept="image/*" class="hidden" />
+                <div id="dz-banner" class="dropzone-area border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-3 text-center cursor-pointer transition bg-[#1c1c1c]">
+                  <div id="prev-banner" class="w-full aspect-video rounded-md overflow-hidden bg-black/60 mb-2 flex items-center justify-center border border-white/10">
+                    <span class="text-[11px] text-neutral-500">16:9</span>
+                  </div>
+                  <p id="stat-banner" class="text-xs text-neutral-300">Cliquer ou glisser une bannière 16:9</p>
+                </div>
+                <input id="f-bannerUrl" type="url" placeholder="URL R2 bannière horizontale..."
+                       class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-1.5 text-xs text-white outline-none" />
+              </div>
+            </div>
+
+            <!-- Vidéo MP4 -->
+            <div class="space-y-2">
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-300">Vidéo / Bande-annonce (.mp4)</label>
+              <input id="file-video" type="file" accept="video/mp4,video/*" class="hidden" />
+              <div id="dz-video" class="dropzone-area border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-3.5 text-center cursor-pointer transition bg-[#1c1c1c] flex flex-col items-center">
+                <svg class="w-6 h-6 text-[#E50914] mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <p id="stat-video" class="text-xs text-neutral-300">Cliquer ou glisser un fichier .mp4 vers Cloudflare R2</p>
+              </div>
+              <input id="f-videoUrl" type="url" placeholder="URL R2 de la vidéo .mp4..."
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-1.5 text-xs text-white outline-none" />
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" id="btn-save-title" class="w-full bg-[#E50914] hover:bg-[#f40612] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-red-900/30 transition text-sm sm:text-base">
+                Enregistrer sur R2
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- =====================================
+           ONGLET 2 : CATÉGORIES
+      ====================================== -->
+      <div id="admin-panel-categories" class="hidden max-w-4xl mx-auto space-y-6">
+        <div class="bg-[#161616] border border-white/10 rounded-xl p-5 sm:p-6">
+          <h2 class="text-lg font-bold mb-1">Ajouter une catégorie</h2>
+          <p class="text-xs text-neutral-400 mb-4">Les catégories vides sont automatiquement masquées sur l'accueil mais restent gérables ici.</p>
+          <form id="form-add-category" class="flex flex-col sm:flex-row gap-3">
+            <input id="new-cat-name" type="text" required placeholder="Nom de la catégorie (ex : Soirée Halloween)"
+                   class="flex-1 bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2.5 text-sm text-white outline-none" />
+            <select id="new-cat-format" class="bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3.5 py-2.5 text-sm text-white outline-none">
+              <option value="horizontal">Horizontal (16:9)</option>
+              <option value="vertical">Vertical (2:3 Originals)</option>
+            </select>
+            <button type="submit" class="bg-[#E50914] hover:bg-[#f40612] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition">
+              + Ajouter
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-[#161616] border border-white/10 rounded-xl p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold">Ordre & gestion des catégories</h2>
+            <button id="btn-save-categories" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+              Sauvegarder sur R2
+            </button>
+          </div>
+          <div id="admin-categories-list" class="space-y-2.5"></div>
+        </div>
+      </div>
+
+      <!-- =====================================
+           ONGLET 3 : CLOUDFLARE R2 & OUTILS
+      ====================================== -->
+      <div id="admin-panel-tools" class="hidden max-w-3xl mx-auto space-y-6">
+        <div class="bg-[#161616] border border-white/10 rounded-xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold">Statut Cloudflare R2</h2>
+            <span id="r2-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              Connecté
+            </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="bg-[#1e1e1e] p-3.5 rounded-lg border border-white/5">
+              <div class="text-neutral-400 mb-1">Worker API</div>
+              <div class="font-mono text-neutral-200 break-all">https://dry-rice-2542floksfix-admin.vivienazzam.workers.dev</div>
+            </div>
+            <div class="bg-[#1e1e1e] p-3.5 rounded-lg border border-white/5">
+              <div class="text-neutral-400 mb-1">Bucket Public R2</div>
+              <div class="font-mono text-neutral-200 break-all">https://pub-338355ba164c4a94b7b8071fed0692c4.r2.dev</div>
+            </div>
+          </div>
+          <div id="r2-stats-line" class="text-sm text-neutral-300"></div>
+        </div>
+
+        <div class="bg-[#161616] border border-white/10 rounded-xl p-6 space-y-4">
+          <h2 class="text-lg font-bold">Catalogue complet de démonstration (48 titres)</h2>
+          <p class="text-sm text-neutral-300 leading-relaxed">
+            Ce bouton ajoute les titres de démonstration manquants (avec leurs distributions, genres, tags et synopsis complets) <strong>sans jamais écraser ni supprimer</strong> tes propres titres personnalisés déjà enregistrés sur R2 (comme ton affiche Sherlock).
+          </p>
+          <button id="btn-merge-demo" class="bg-[#E50914] hover:bg-[#f40612] text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg transition">
+            Importer / Fusionner le catalogue complet (48 titres de démo)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="pointer-events-none fixed bottom-6 right-6 z-[110] opacity-0 translate-y-3 transition-all duration-300 bg-[#181818]/95 border border-white/20 backdrop-blur-md text-white text-xs sm:text-sm px-4 py-3 rounded-lg shadow-2xl flex items-center gap-2.5 max-w-sm">
+    <span id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toast-text">Synchronisé sur Cloudflare R2</span>
+  </div>
+
+  <!-- =========================================================================
+       JAVASCRIPT — LOGIQUE COMPLÈTE FLOKS'IX
+  ========================================================================== -->
+  <script>
+    /*************************************************************************
+     * CONFIGURATION CLOUDFLARE R2 & WORKER
+     *************************************************************************/
+    const WORKER_URL = "https://dry-rice-2542floksfix-admin.vivienazzam.workers.dev";
+    const PUBLIC_R2_URL = "https://pub-338355ba164c4a94b7b8071fed0692c4.r2.dev";
+    const ADMIN_PIN = "9999";
+
+    const PROFILES = [
+      { id: "floki", name: "Floki", color: "from-[#E50914] to-[#7a0309]", initial: "F" },
+      { id: "viv",   name: "Viv'",  color: "from-[#0284c7] to-[#082f49]", initial: "V" },
+      { id: "guest", name: "Invité", color: "from-[#059669] to-[#064e3b]", initial: "I" }
+    ];
+
+    const DEFAULT_CATEGORIES = [
+      { id: "cat-originals", name: "Originals FLOKS'IX", format: "vertical" },
+      { id: "cat-tendances", name: "Tendances actuelles", format: "horizontal" },
+      { id: "cat-enquetes",  name: "Enquêtes & Mystères", format: "horizontal" },
+      { id: "cat-comedies",  name: "Comédies & Cultes", format: "horizontal" },
+      { id: "cat-action",    name: "Action & Aventure", format: "horizontal" },
+      { id: "cat-docs",      name: "Documentaires & Gastronomie", format: "horizontal" }
+    ];
+
+    /*************************************************************************
+     * CATALOGUE PAR DÉFAUT — 48 TITRES COMPLETS EN FRANÇAIS
+     *************************************************************************/
+    const DEFAULT_ITEMS = [
+      // === 1. ORIGINALS FLOKS'IX (8 titres) ===
+      {
+        id: "sherlock",
+        title: "SHERLOCK",
+        type: "Série",
+        year: 2026,
+        duration: "4 saisons",
+        match: 99,
+        rating: "13+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: true,
+        cast: "Vivien Azzam, Teva",
+        genres: "Policier, Mystère, Thriller britannique",
+        tags: "Cérébral, Sombre, Palpitant",
+        synopsis: "Dans un Londres moderne et brumeux, deux enquêteurs hors normes résolvent les affaires les plus impossibles de Scotland Yard, entre déductions fulgurantes et secrets bien gardés.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "laffaire-floksi",
+        title: "L'AFFAIRE FLOKSI",
+        type: "Série",
+        year: 2026,
+        duration: "1 saison",
+        match: 99,
+        rating: "16+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Floki, Vivien Azzam, Teva",
+        genres: "Thriller, Enquête, Espionnage",
+        tags: "Mystérieux, Addictif, Immersif",
+        synopsis: "Un message codé glissé dans un journal papier déclenche une chasse aux indices à travers Genève. Chaque épisode cache une véritable piste pour la suite de la mission.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "la-pizz-della-pive",
+        title: "LA PIZZ' DELLA PIVE",
+        type: "Film",
+        year: 2026,
+        duration: "1 h 34 min",
+        match: 98,
+        rating: "Tous publics",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Vivien Azzam, Floki, Chef Luigi",
+        genres: "Comédie, Gastronomie, Culinaire",
+        tags: "Savoureux, Décalé, Feel-good",
+        synopsis: "48 heures de fermentation, 67 % d'hydratation et un four poussé à 450 degrés : plongée sous haute tension dans la quête de la pâte napolitaine parfaite.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "protocole-minuit",
+        title: "PROTOCOLE MINUIT",
+        type: "Série",
+        year: 2026,
+        duration: "2 saisons",
+        match: 97,
+        rating: "16+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Vivien Azzam, Floki, Agent K",
+        genres: "Sci-Fi, Thriller, Mystère",
+        tags: "Intense, Paranoïaque, Rythmé",
+        synopsis: "À minuit pile, un signal pirate s'affiche sur la télévision du salon. Deux complices n'ont que quelques heures pour décoder la fréquence avant son effacement définitif.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "geneve-confidential",
+        title: "GENÈVE CONFIDENTIAL",
+        type: "Série",
+        year: 2025,
+        duration: "1 saison",
+        match: 96,
+        rating: "16+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Teva, Vivien Azzam, Inspecteur Léman",
+        genres: "Polar, Drame, Intrigue",
+        tags: "Élégant, Tendu, Nocturne",
+        synopsis: "Des quais brumeux du lac Léman aux ruelles de la Vieille-Ville, un duo d'enquêteurs découvre un réseau de faussaires d'œuvres d'art qui prépare le casse du siècle.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "le-dernier-vinyle",
+        title: "LE DERNIER VINYLE",
+        type: "Film",
+        year: 2027,
+        duration: "1 h 52 min",
+        match: 99,
+        rating: "10+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Floki, Vivien Azzam",
+        genres: "Drame, Musique, Mystère",
+        tags: "Émouvant, Nostalgique, Poétique",
+        synopsis: "Un disque pressé à un seul exemplaire renferme une piste cachée que seule une caméra magique peut révéler. Un voyage musical entre souvenirs et secrets.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "les-chroniques-du-salon",
+        title: "LES CHRONIQUES DU SALON",
+        type: "Série",
+        year: 2026,
+        duration: "3 saisons",
+        match: 95,
+        rating: "Tous publics",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Floki, Vivien Azzam, Teva",
+        genres: "Sitcom, Comédie, Tranche de vie",
+        tags: "Drôle, Chaleureux, Culte",
+        synopsis: "Entre soirées jeux de société qui dégénèrent, débats passionnés sur le cinéma et recettes improvisées à 23 heures, rien ne se passe jamais comme prévu.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "operation-2028",
+        title: "OPÉRATION 2028",
+        type: "Film",
+        year: 2028,
+        duration: "2 h 05 min",
+        match: 99,
+        rating: "13+",
+        category: "Originals FLOKS'IX",
+        isOriginal: true,
+        featured: false,
+        cast: "Vivien Azzam, Floki, Teva",
+        genres: "Aventure, Action, Final",
+        tags: "Épique, Surprenant, Grandiose",
+        synopsis: "Quatre années d'indices, un site web, un journal, une plateforme de streaming et un objet mystérieux convergent vers le grand final tant attendu.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+
+      // === 2. TENDANCES ACTUELLES (8 titres) ===
+      {
+        id: "peaky-blinders",
+        title: "PEAKY BLINDERS",
+        type: "Série",
+        year: 2022,
+        duration: "6 saisons",
+        match: 98,
+        rating: "18+",
+        category: "Tendances actuelles",
+        isOriginal: false,
+        featured: false,
+        cast: "Cillian Murphy, Paul Anderson, Helen McCrory, Tom Hardy",
+        genres: "Drame historique, Gangsters, Britannique",
+        tags: "Sombre, Stylisé, Brutal",
+        synopsis: "Dans le Birmingham de l'après-guerre, l'ambitieux Thomas Shelby mène son clan familial au sommet du crime organisé grâce à son sang-froid redoutable.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "breaking-bad",
+        title: "BREAKING BAD",
+        type: "Série",
+        year: 2013,
+        duration: "5 saisons",
+        match: 99,
+        rating: "18+",
+        category: "Tendances actuelles",
+        isOriginal: false,
+        featured: false,
+        cast: "Bryan Cranston, Aaron Paul, Anna Gunn, Bob Odenkirk",
+        genres: "Thriller, Drame, Crime",
+        tags: "Magistral, Tendu, Incontournable",
+        synopsis: "Un professeur de chimie surqualifié atteint d'un cancer s'associe à un ancien élève pour bâtir un empire clandestin et mettre sa famille à l'abri.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "stranger-things",
+        title: "STRANGER THINGS",
+        type: "Série",
+        year: 2025,
+        duration: "5 saisons",
+        match: 97,
+        rating: "16+",
+        category: "Tendances actuelles",
+        isOriginal: true,
+        featured: false,
+        cast: "Millie Bobby Brown, Finn Wolfhard, Winona Ryder, David Harbour",
+        genres: "Sci-Fi, Fantastique, Années 80",
+        tags: "Nostalgique, Effrayant, Captivant",
+        synopsis: "Quand un jeune garçon disparaît à Hawkins en 1983, ses amis découvrent une faille vers un monde parallèle peuplé de créatures terrifiantes.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "la-casa-de-papel",
+        title: "LA CASA DE PAPEL",
+        type: "Série",
+        year: 2021,
+        duration: "5 parties",
+        match: 96,
+        rating: "16+",
+        category: "Tendances actuelles",
+        isOriginal: true,
+        featured: false,
+        cast: "Álvaro Morte, Úrsula Corberó, Pedro Alonso, Itziar Ituño",
+        genres: "Braquage, Action, Thriller espagnol",
+        tags: "Adrénaline, Ingénieux, Haletant",
+        synopsis: "Un génie mystérieux surnommé Le Professeur recrute huit criminels pour réaliser le plus grand braquage de l'histoire à la Fabrique nationale de la monnaie de Madrid.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "the-last-of-us",
+        title: "THE LAST OF US",
+        type: "Série",
+        year: 2025,
+        duration: "2 saisons",
+        match: 98,
+        rating: "18+",
+        category: "Tendances actuelles",
+        isOriginal: false,
+        featured: false,
+        cast: "Pedro Pascal, Bella Ramsey, Gabriel Luna",
+        genres: "Post-apocalyptique, Drame, Aventure",
+        tags: "Bouleversant, Tendu, Survie",
+        synopsis: "Vingt ans après l'effondrement de la civilisation moderne, un survivant endurci est chargé d'escorter une adolescente qui pourrait être l'ultime espoir de l'humanité.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "severance",
+        title: "SEVERANCE",
+        type: "Série",
+        year: 2025,
+        duration: "2 saisons",
+        match: 97,
+        rating: "16+",
+        category: "Tendances actuelles",
+        isOriginal: false,
+        featured: false,
+        cast: "Adam Scott, Britt Lower, Zach Cherry, John Turturro",
+        genres: "Thriller psychologique, Sci-Fi, Mystère",
+        tags: "Cérébral, Troublant, Brillant",
+        synopsis: "Chez Lumon Industries, les employés subissent une opération chirurgicale séparant totalement leurs souvenirs professionnels de leur vie personnelle.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "succession",
+        title: "SUCCESSION",
+        type: "Série",
+        year: 2023,
+        duration: "4 saisons",
+        match: 95,
+        rating: "16+",
+        category: "Tendances actuelles",
+        isOriginal: false,
+        featured: false,
+        cast: "Brian Cox, Jeremy Strong, Sarah Snook, Kieran Culkin",
+        genres: "Drame, Satire, Pouvoir",
+        tags: "Mordant, Cynique, Prestigieux",
+        synopsis: "La famille Roy contrôle l'un des plus puissants conglomérats médiatiques au monde. Alors que le patriarche vacille, ses enfants se livrent une guerre sans merci.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "dark",
+        title: "DARK",
+        type: "Série",
+        year: 2020,
+        duration: "3 saisons",
+        match: 98,
+        rating: "16+",
+        category: "Tendances actuelles",
+        isOriginal: true,
+        featured: false,
+        cast: "Louis Hofmann, Lisa Vicari, Andreas Pietschmann",
+        genres: "Sci-Fi, Mystère, Thriller allemand",
+        tags: "Labyrinthique, Hypnotique, Sombre",
+        synopsis: "La disparition d'un enfant dans une petite ville allemande révèle les doubles vies et les liens fracturés de quatre familles sur plusieurs époques.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+
+      // === 3. ENQUÊTES & MYSTÈRES (8 titres) ===
+      {
+        id: "only-murders",
+        title: "ONLY MURDERS IN THE BUILDING",
+        type: "Série",
+        year: 2025,
+        duration: "5 saisons",
+        match: 97,
+        rating: "13+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Steve Martin, Martin Short, Selena Gomez",
+        genres: "Comédie policière, Mystère, New York",
+        tags: "Malin, Cosy, Savoureux",
+        synopsis: "Trois voisins passionnés de podcasts criminels décident d'enregistrer leur propre enquête lorsqu'un meurtre survient dans leur immeuble chic de Manhattan.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "true-detective",
+        title: "TRUE DETECTIVE",
+        type: "Série",
+        year: 2024,
+        duration: "4 saisons",
+        match: 96,
+        rating: "18+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Matthew McConaughey, Woody Harrelson, Jodie Foster",
+        genres: "Polar, Anthologie, Thriller noir",
+        tags: "Poisseux, Philosophique, Intense",
+        synopsis: "Des enquêtes criminelles glaçantes qui poussent les détectives au bord du gouffre, entre secrets enfouis et obsessions personnelles.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "mindhunter",
+        title: "MINDHUNTER",
+        type: "Série",
+        year: 2019,
+        duration: "2 saisons",
+        match: 96,
+        rating: "18+",
+        category: "Enquêtes & Mystères",
+        isOriginal: true,
+        featured: false,
+        cast: "Jonathan Groff, Holt McCallany, Anna Torv",
+        genres: "Policier, Thriller psychologique, FBI",
+        tags: "Glacial, Fascinant, Chirurgical",
+        synopsis: "À la fin des années 1970, deux agents du FBI révolutionnent la criminologie en interrogeant les tueurs en série emprisonnés pour comprendre leur psychologie.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "knives-out",
+        title: "À COUTEAUX TIRÉS",
+        type: "Film",
+        year: 2019,
+        duration: "2 h 10 min",
+        match: 97,
+        rating: "13+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Daniel Craig, Ana de Armas, Chris Evans, Jamie Lee Curtis",
+        genres: "Enquête, Comédie policière, Whodunit",
+        tags: "Astucieux, Jubilatoire, Rythmé",
+        synopsis: "Après la mort mystérieuse d'un célèbre auteur de polars dans son manoir, le détective excentrique Benoit Blanc passe au crible toute sa famille excentrique.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "zodiac",
+        title: "ZODIAC",
+        type: "Film",
+        year: 2007,
+        duration: "2 h 37 min",
+        match: 95,
+        rating: "16+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Jake Gyllenhaal, Robert Downey Jr., Mark Ruffalo",
+        genres: "Thriller, Polar, Faits réels",
+        tags: "Obsessionnel, Minutieux, Culte",
+        synopsis: "Un dessinateur de presse et deux enquêteurs de San Francisco s'enfoncent dans une traque de plusieurs décennies pour démasquer le tueur aux lettres codées.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "shutter-island",
+        title: "SHUTTER ISLAND",
+        type: "Film",
+        year: 2010,
+        duration: "2 h 18 min",
+        match: 96,
+        rating: "16+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Leonardo DiCaprio, Mark Ruffalo, Ben Kingsley",
+        genres: "Thriller psychologique, Mystère",
+        tags: "Vertigineux, Sombre, Inoubliable",
+        synopsis: "En 1954, le marshal Teddy Daniels enquête sur la disparition inexplicable d'une patiente dans un hôpital psychiatrique isolé au large de Boston.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "luther",
+        title: "LUTHER",
+        type: "Série",
+        year: 2019,
+        duration: "5 saisons",
+        match: 94,
+        rating: "16+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "Idris Elba, Ruth Wilson, Warren Brown",
+        genres: "Policier, Thriller britannique, Sombre",
+        tags: "Nerveux, Charismatique, Intense",
+        synopsis: "Inspecteur brillant mais rongé par ses propres démons, John Luther traque les pires criminels de Londres à la frontière de la légalité.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "broadchurch",
+        title: "BROADCHURCH",
+        type: "Série",
+        year: 2017,
+        duration: "3 saisons",
+        match: 95,
+        rating: "13+",
+        category: "Enquêtes & Mystères",
+        isOriginal: false,
+        featured: false,
+        cast: "David Tennant, Olivia Colman, Jodie Whittaker",
+        genres: "Enquête, Drame britannique, Mystère",
+        tags: "Émouvant, Captivant, Soigné",
+        synopsis: "La tranquillité d'une petite ville côtière anglaise vole en éclats lorsqu'une affaire tragique révèle les secrets de chacun de ses habitants.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+
+      // === 4. COMÉDIES & CULTES (8 titres) ===
+      {
+        id: "friends",
+        title: "FRIENDS",
+        type: "Série",
+        year: 2004,
+        duration: "10 saisons",
+        match: 98,
+        rating: "Tous publics",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Jennifer Aniston, Courteney Cox, Lisa Kudrow, Matt LeBlanc, Matthew Perry, David Schwimmer",
+        genres: "Sitcom, Comédie, Culte",
+        tags: "Réconfortant, Hilarant, Intemporel",
+        synopsis: "Les amours, les galères professionnelles et les cafés interminables au Central Perk de six amis inséparables à New York.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "the-office",
+        title: "THE OFFICE (US)",
+        type: "Série",
+        year: 2013,
+        duration: "9 saisons",
+        match: 99,
+        rating: "13+",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Steve Carell, John Krasinski, Jenna Fischer, Rainn Wilson",
+        genres: "Comédie, Mockumentary, Bureau",
+        tags: "Absurde, Culte, Irrésistible",
+        synopsis: "Le quotidien complètement déjanté des employés de la papeterie Dunder Mifflin à Scranton, dirigés par l'inénarrable Michael Scott.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "brooklyn-99",
+        title: "BROOKLYN NINE-NINE",
+        type: "Série",
+        year: 2021,
+        duration: "8 saisons",
+        match: 97,
+        rating: "13+",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Andy Samberg, Andre Braugher, Stephanie Beatriz, Terry Crews",
+        genres: "Comédie policière, Sitcom",
+        tags: "Dynamique, Attachant, Fun",
+        synopsis: "Jake Peralta, détective brillant mais immature, voit sa routine bouleversée par l'arrivée du capitaine Holt, aussi strict qu'impassible.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "kaamelott",
+        title: "KAAMELOTT",
+        type: "Série",
+        year: 2009,
+        duration: "6 livres",
+        match: 99,
+        rating: "10+",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Alexandre Astier, Lionnel Astier, Franck Pitiot, Jean-Christophe Hembert",
+        genres: "Comédie, Médiéval, Culte français",
+        tags: "Ciselé, Absurde, Légendaire",
+        synopsis: "Le roi Arthur tente désespérément de mener la quête du Graal entouré de chevaliers de la Table Ronde particulièrement incompétents.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "oss-117",
+        title: "OSS 117 : LE CAIRE, NID D'ESPIONS",
+        type: "Film",
+        year: 2006,
+        duration: "1 h 39 min",
+        match: 98,
+        rating: "Tous publics",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Jean Dujardin, Bérénice Bejo, Aure Atika",
+        genres: "Comédie, Espionnage, Parodie",
+        tags: "Satirique, Répliques cultes, Hilarant",
+        synopsis: "En 1955, l'agent secret Hubert Bonisseur de La Bath est envoyé au Caire pour sécuriser le canal de Suez avec un tact tout relatif.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "mission-cleopatre",
+        title: "ASTÉRIX & OBÉLIX : MISSION CLÉOPÂTRE",
+        type: "Film",
+        year: 2002,
+        duration: "1 h 47 min",
+        match: 99,
+        rating: "Tous publics",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Gérard Depardieu, Christian Clavier, Jamel Debbouze, Monica Bellucci, Alain Chabat",
+        genres: "Comédie, Aventure, Culte",
+        tags: "Mythique, Décalé, Familial",
+        synopsis: "Pour prouver la grandeur de l'Égypte à César, Cléopâtre confie à Numérobis la construction d'un palais somptueux en trois mois chrono.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "ted-lasso",
+        title: "TED LASSO",
+        type: "Série",
+        year: 2023,
+        duration: "3 saisons",
+        match: 97,
+        rating: "13+",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Jason Sudeikis, Hannah Waddingham, Brett Goldstein, Juno Temple",
+        genres: "Comédie, Sport, Feel-good",
+        tags: "Bienveillant, Drôle, Touchant",
+        synopsis: "Un coach de football américain d'un optimisme inébranlable est embauché pour entraîner un club de football anglais… alors qu'il n'en connaît pas les règles.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "parks-and-rec",
+        title: "PARKS AND RECREATION",
+        type: "Série",
+        year: 2015,
+        duration: "7 saisons",
+        match: 95,
+        rating: "10+",
+        category: "Comédies & Cultes",
+        isOriginal: false,
+        featured: false,
+        cast: "Amy Poehler, Nick Offerman, Aubrey Plaza, Chris Pratt",
+        genres: "Comédie, Sitcom, Satire",
+        tags: "Joyeux, Excentrique, Pétillant",
+        synopsis: "L'enthousiasme débordant de Leslie Knope pour transformer un terrain vague en parc municipal face à une administration locale imprévisible.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+
+      // === 5. ACTION & AVENTURE (8 titres) ===
+      {
+        id: "spider-man-nwh",
+        title: "SPIDER-MAN : NO WAY HOME",
+        type: "Film",
+        year: 2021,
+        duration: "2 h 28 min",
+        match: 97,
+        rating: "10+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Tom Holland, Zendaya, Benedict Cumberbatch, Willem Dafoe",
+        genres: "Super-héros, Action, Aventure",
+        tags: "Spectaculaire, Émouvant, Épique",
+        synopsis: "Lorsque l'identité de Spider-Man est révélée au monde entier, un sortilège du Docteur Strange ouvre accidentellement les portes du multivers.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "inception",
+        title: "INCEPTION",
+        type: "Film",
+        year: 2010,
+        duration: "2 h 28 min",
+        match: 99,
+        rating: "13+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Leonardo DiCaprio, Joseph Gordon-Levitt, Marion Cotillard, Tom Hardy",
+        genres: "Sci-Fi, Action, Thriller",
+        tags: "Cérébral, Vertigineux, Chef-d'œuvre",
+        synopsis: "Dom Cobb est un voleur d'élite spécialisé dans l'extraction de secrets au cœur des rêves. Sa dernière mission : implanter une idée au lieu d'en voler une.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "interstellar",
+        title: "INTERSTELLAR",
+        type: "Film",
+        year: 2014,
+        duration: "2 h 49 min",
+        match: 99,
+        rating: "10+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Matthew McConaughey, Anne Hathaway, Jessica Chastain, Michael Caine",
+        genres: "Sci-Fi, Aventure, Drame spatial",
+        tags: "Grandiose, Bouleversant, Visionnaire",
+        synopsis: "Alors que la Terre devient inhabitable, un groupe d'explorateurs traverse un trou de ver près de Saturne pour trouver une nouvelle planète à l'humanité.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "dune",
+        title: "DUNE : DEUXIÈME PARTIE",
+        type: "Film",
+        year: 2024,
+        duration: "2 h 46 min",
+        match: 98,
+        rating: "13+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Timothée Chalamet, Zendaya, Rebecca Ferguson, Javier Bardem",
+        genres: "Sci-Fi, Épopée, Aventure",
+        tags: "Monumental, Immersif, Hypnotique",
+        synopsis: "Paul Atréides s'unit aux Fremen sur la planète désertique Arrakis pour venger sa famille et affronter un destin qui pourrait embraser la galaxie.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "the-dark-knight",
+        title: "THE DARK KNIGHT",
+        type: "Film",
+        year: 2008,
+        duration: "2 h 32 min",
+        match: 99,
+        rating: "13+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Christian Bale, Heath Ledger, Aaron Eckhart, Gary Oldman",
+        genres: "Action, Thriller, Super-héros",
+        tags: "Sombre, Intense, Mythique",
+        synopsis: "À Gotham City, Batman affronte le Joker, un génie du chaos déterminé à pousser la ville et son protecteur au-delà de leurs limites morales.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "mad-max-fury-road",
+        title: "MAD MAX : FURY ROAD",
+        type: "Film",
+        year: 2015,
+        duration: "2 h 00 min",
+        match: 96,
+        rating: "16+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Tom Hardy, Charlize Theron, Nicholas Hoult",
+        genres: "Action, Post-apocalyptique, Course-poursuite",
+        tags: "Explosif, Furieux, Visuel",
+        synopsis: "Dans un désert impitoyable, Max s'allie à l'impératrice Furiosa dans une fuite mécanique effrénée face à l'armée d'un tyran.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "top-gun-maverick",
+        title: "TOP GUN : MAVERICK",
+        type: "Film",
+        year: 2022,
+        duration: "2 h 10 min",
+        match: 97,
+        rating: "10+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Tom Cruise, Miles Teller, Jennifer Connelly, Glen Powell",
+        genres: "Action, Aviation, Blockbuster",
+        tags: "Adrénaline, Spectaculaire, Exaltant",
+        synopsis: "Après plus de trente ans de service, Pete « Maverick » Mitchell est rappelé pour former un détachement d'élite à une mission jugée impossible.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "seigneur-des-anneaux",
+        title: "LE SEIGNEUR DES ANNEAUX",
+        type: "Film",
+        year: 2001,
+        duration: "2 h 58 min",
+        match: 99,
+        rating: "13+",
+        category: "Action & Aventure",
+        isOriginal: false,
+        featured: false,
+        cast: "Elijah Wood, Ian McKellen, Viggo Mortensen, Sean Astin",
+        genres: "Fantasy, Aventure, Épopée",
+        tags: "Légendaire, Magique, Intemporel",
+        synopsis: "Un jeune Hobbit hérite d'un anneau maléfique convoité par le seigneur des ténèbres Sauron et entreprend un voyage périlleux pour le détruire.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+
+      // === 6. DOCUMENTAIRES & GASTRONOMIE (8 titres) ===
+      {
+        id: "chefs-table",
+        title: "CHEF'S TABLE",
+        type: "Série",
+        year: 2024,
+        duration: "7 volumes",
+        match: 97,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: true,
+        featured: false,
+        cast: "Massimo Bottura, Franco Pepe, Virgilio Martínez",
+        genres: "Documentaire, Gastronomie, Art culinaire",
+        tags: "Inspirant, Esthétique, Appétissant",
+        synopsis: "Portraits cinématographiques des chefs les plus visionnaires de la planète qui redéfinissent la gastronomie moderne, de la haute cuisine à la pizza artisanale.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "f1-drive-to-survive",
+        title: "FORMULA 1 : PILOTES DE LEUR DESTIN",
+        type: "Série",
+        year: 2026,
+        duration: "8 saisons",
+        match: 95,
+        rating: "13+",
+        category: "Documentaires & Gastronomie",
+        isOriginal: true,
+        featured: false,
+        cast: "Lewis Hamilton, Max Verstappen, Charles Leclerc, Frédéric Vasseur",
+        genres: "Documentaire sportif, Automobile",
+        tags: "Nerveux, Coulisses, Passionnant",
+        synopsis: "Immersion totale dans le paddock de Formule 1, au cœur des rivalités, des stratégies d'écurie et de la pression extrême de chaque Grand Prix.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "notre-planete",
+        title: "NOTRE PLANÈTE",
+        type: "Série",
+        year: 2023,
+        duration: "2 saisons",
+        match: 96,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: true,
+        featured: false,
+        cast: "David Attenborough",
+        genres: "Nature, Documentaire, Science",
+        tags: "Éblouissant, Apaisant, Grandiose",
+        synopsis: "Des images d'une beauté stupéfiante capturant la faune sauvage et les écosystèmes les plus reculés de la Terre en ultra-haute définition.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "jiro-dreams-of-sushi",
+        title: "JIRO DREAMS OF SUSHI",
+        type: "Film",
+        year: 2011,
+        duration: "1 h 21 min",
+        match: 96,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: false,
+        featured: false,
+        cast: "Jiro Ono, Yoshikazu Ono",
+        genres: "Documentaire, Gastronomie, Japon",
+        tags: "Zen, Fascinant, Exigeant",
+        synopsis: "À 85 ans, le maître Jiro Ono consacre chaque jour de sa vie à la perfection absolue du sushi dans son minuscule restaurant étoilé du métro de Tokyo.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "free-solo",
+        title: "FREE SOLO",
+        type: "Film",
+        year: 2018,
+        duration: "1 h 40 min",
+        match: 97,
+        rating: "10+",
+        category: "Documentaires & Gastronomie",
+        isOriginal: false,
+        featured: false,
+        cast: "Alex Honnold, Tommy Caldwell, Jimmy Chin",
+        genres: "Documentaire, Escalade, Aventure",
+        tags: "Vertigineux, Haletant, Hors norme",
+        synopsis: "Le grimpeur Alex Honnold prépare l'impensable : gravir les 900 mètres de la paroi verticale d'El Capitan à Yosemite sans aucune corde ni sécurité.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "street-food-europe",
+        title: "STREET FOOD : EUROPE",
+        type: "Série",
+        year: 2024,
+        duration: "1 saison",
+        match: 94,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: true,
+        featured: false,
+        cast: "Artisans culinaires de Naples, Lisbonne, Lyon et Athènes",
+        genres: "Documentaire, Voyage, Gastronomie",
+        tags: "Gourmand, Authentique, Humain",
+        synopsis: "À la rencontre des cuisiniers de rue passionnés qui perpétuent les recettes populaires et les saveurs emblématiques des grandes villes européennes.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "lart-du-vinyle",
+        title: "L'ART DU VINYLE",
+        type: "Film",
+        year: 2025,
+        duration: "1 h 12 min",
+        match: 95,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: true,
+        featured: false,
+        cast: "Ingénieurs du son, Disquaires indépendants, Collectionneurs",
+        genres: "Documentaire, Musique, Culture",
+        tags: "Chaleureux, Analogique, Passionné",
+        synopsis: "Du pressage de la cire chaude au craquement mythique du saphir, plongée dans la renaissance mondiale du disque vinyle et de ses pochettes cultes.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      },
+      {
+        id: "mystere-des-alpes",
+        title: "LE MYSTÈRE DES ALPES",
+        type: "Film",
+        year: 2025,
+        duration: "1 h 28 min",
+        match: 94,
+        rating: "Tous publics",
+        category: "Documentaires & Gastronomie",
+        isOriginal: false,
+        featured: false,
+        cast: "Guides de haute montagne, Glaciologues suisses",
+        genres: "Documentaire, Nature, Suisse",
+        tags: "Majestueux, Immersif, Contemplatif",
+        synopsis: "Un voyage spectaculaire à travers les sommets, glaciers et vallées secrètes des Alpes suisses au fil des quatre saisons.",
+        posterUrl: "",
+        bannerUrl: "",
+        videoUrl: ""
+      }
+    ];
+
+    // Palettes sombres cinématographiques pour les cartes sans image
+    const FALLBACK_GRADIENTS = [
+      ["#102a43", "#050d16", "#38bdf8"],
+      ["#5c0b10", "#120405", "#E50914"],
+      ["#1f2937", "#090d12", "#9ca3af"],
+      ["#311042", "#0c0412", "#c084fc"],
+      ["#3f2608", "#120a02", "#f59e0b"],
+      ["#063b2d", "#02120d", "#34d399"],
+      ["#1e1b4b", "#070617", "#818cf8"]
+    ];
+
+    /*************************************************************************
+     * ÉTAT GLOBAL DE L'APPLICATION
+     *************************************************************************/
+    const state = {
+      items: [],
+      categories: [],
+      activeProfile: PROFILES[0],
+      navFilter: "HOME", // HOME | Série | Film | MYLIST
+      searchQuery: "",
+      heroItem: null,
+      detailItem: null,
+      myListIds: [],
+      pinInput: "",
+      logoClicks: 0,
+      logoClickTimer: null,
+      r2Connected: false,
+      // Navigation clavier / Fire TV
+      focusArea: "profiles", // profiles | hero | rows
+      profileFocusIdx: 0,
+      heroBtnIdx: 0,
+      rowIdx: 0,
+      colIdx: 0,
+      renderedRows: []
+    };
+
+    /*************************************************************************
+     * UTILITAIRES : TOAST, AUDIO TUDUM, FALLBACK VISUEL
+     *************************************************************************/
+    let toastTimer = null;
+    function showToast(message, isError = false) {
+      const el = document.getElementById("toast");
+      const dot = document.getElementById("toast-dot");
+      document.getElementById("toast-text").textContent = message;
+      dot.className = `w-2.5 h-2.5 rounded-full shrink-0 ${isError ? "bg-[#E50914]" : "bg-emerald-400"}`;
+      el.classList.remove("opacity-0", "translate-y-3");
+      el.classList.add("opacity-100", "translate-y-0");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add("opacity-0", "translate-y-3");
+        el.classList.remove("opacity-100", "translate-y-0");
+      }, 3600);
+    }
+
+    let audioCtx = null;
+    function playTudumSound() {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) audioCtx = new Ctx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        // Impact 1 ("Tu-")
+        const o1 = audioCtx.createOscillator();
+        const g1 = audioCtx.createGain();
+        o1.type = "sine";
+        o1.frequency.setValueAtTime(118, now);
+        o1.frequency.exponentialRampToValueAtTime(40, now + 0.22);
+        g1.gain.setValueAtTime(0.001, now);
+        g1.gain.linearRampToValueAtTime(0.62, now + 0.02);
+        g1.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        o1.connect(g1).connect(audioCtx.destination);
+        o1.start(now);
+        o1.stop(now + 0.34);
+
+        // Impact 2 ("-dum" résonance cinématographique)
+        const t2 = now + 0.24;
+        [
+          { f: 55, type: "triangle", peak: 0.56, dur: 1.9, drop: 37 },
+          { f: 110, type: "sine", peak: 0.22, dur: 2.2 },
+          { f: 164.81, type: "sine", peak: 0.13, dur: 2.4 },
+          { f: 220, type: "sine", peak: 0.06, dur: 2.1 }
+        ].forEach(h => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = h.type;
+          osc.frequency.setValueAtTime(h.f, t2);
+          if (h.drop) osc.frequency.exponentialRampToValueAtTime(h.drop, t2 + 1.5);
+          g.gain.setValueAtTime(0.001, t2);
+          g.gain.linearRampToValueAtTime(h.peak, t2 + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.0008, t2 + h.dur);
+          osc.connect(g).connect(audioCtx.destination);
+          osc.start(t2);
+          osc.stop(t2 + h.dur + 0.1);
+        });
+      } catch {}
+    }
+
+    function getPaletteForItem(item) {
+      let hash = 0;
+      const str = (item.id || item.title || "fx");
+      for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) | 0;
+      return FALLBACK_GRADIENTS[Math.abs(hash) % FALLBACK_GRADIENTS.length];
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function buildFallbackGraphic(item, isLarge = false) {
+      const [c1, c2, accent] = getPaletteForItem(item);
+      return `
+        <div class="w-full h-full relative overflow-hidden flex flex-col justify-end p-4"
+             style="background: radial-gradient(circle at 75% 25%, ${c1} 0%, ${c2} 70%, #090909 100%);">
+          <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full blur-3xl opacity-25" style="background:${accent};"></div>
+          ${!isLarge ? `
+            <div class="relative z-10">
+              <div class="text-[9px] uppercase tracking-[0.22em] font-semibold mb-1 opacity-80" style="color:${accent}">${escapeHtml(item.type || "Série")}</div>
+              <div class="font-display text-xl sm:text-2xl text-white leading-tight drop-shadow">${escapeHtml(item.title)}</div>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function loadMyList() {
+      try {
+        const raw = localStorage.getItem(`floksix_mylist_${state.activeProfile.id}`);
+        state.myListIds = raw ? JSON.parse(raw) : [];
+      } catch {
+        state.myListIds = [];
+      }
+    }
+
+    function toggleMyList(itemId) {
+      const idx = state.myListIds.indexOf(itemId);
+      if (idx === -1) {
+        state.myListIds.push(itemId);
+        showToast("Ajouté à Ma liste");
+      } else {
+        state.myListIds.splice(idx, 1);
+        showToast("Retiré de Ma liste");
+      }
+      try {
+        localStorage.setItem(`floksix_mylist_${state.activeProfile.id}`, JSON.stringify(state.myListIds));
+      } catch {}
+      updateDetailMyListBtn();
+      if (state.navFilter === "MYLIST") renderCatalogView();
+    }
+
+    /*************************************************************************
+     * COMPATIBILITÉ & SYNCHRONISATION CLOUDFLARE R2
+     *************************************************************************/
+    function normalizeItem(raw, index = 0) {
+      return {
+        id: raw.id || `item-${Date.now()}-${index}`,
+        title: (raw.title || "SANS TITRE").toString(),
+        type: raw.type || "Série",
+        year: Number(raw.year) || 2026,
+        duration: raw.duration || "1 saison",
+        match: Number(raw.match) || 98,
+        rating: raw.rating || "16+",
+        category: raw.category || "Tendances actuelles",
+        isOriginal: Boolean(raw.isOriginal),
+        featured: Boolean(raw.featured || raw.isFeatured || raw.isHero),
+        cast: raw.cast || "",
+        genres: raw.genres || raw.category || "Drame",
+        tags: raw.tags || "Captivant, Cinématographique",
+        synopsis: raw.synopsis || "",
+        // Rétrocompatibilité totale avec les anciens noms de champs
+        posterUrl: raw.posterUrl || raw.posterVerticalUrl || "",
+        bannerUrl: raw.bannerUrl || raw.posterHorizontalUrl || "",
+        videoUrl: raw.videoUrl || ""
+      };
+    }
+
+    function mergeCategoriesFromItems(baseCategories, items) {
+      const cats = baseCategories.map(c => ({
+        id: c.id || `cat-${c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+        name: c.name,
+        format: c.format === "vertical" ? "vertical" : "horizontal"
+      }));
+      const names = new Set(cats.map(c => c.name));
+      items.forEach(item => {
+        if (item.category && !names.has(item.category)) {
+          names.add(item.category);
+          cats.push({
+            id: `cat-${item.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now().toString().slice(-3)}`,
+            name: item.category,
+            format: item.category.toLowerCase().includes("original") ? "vertical" : "horizontal"
+          });
+        }
+      });
+      return cats;
+    }
+
+    async function fetchCatalogFromR2() {
+      try {
+        const res = await fetch(`${WORKER_URL}/catalog.json?t=${Date.now()}`, { method: "GET" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        state.r2Connected = true;
+
+        // Format 1 : Ancien format tableau JSON [...]
+        if (Array.isArray(data)) {
+          if (data.length === 0) {
+            state.items = DEFAULT_ITEMS.map((it, i) => normalizeItem(it, i));
+            state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+          } else {
+            state.items = data.map((it, i) => normalizeItem(it, i));
+            state.categories = mergeCategoriesFromItems(DEFAULT_CATEGORIES, state.items);
+          }
+        }
+        // Format 2 : Nouveau format objet { items, categories }
+        else if (data && typeof data === "object" && Array.isArray(data.items)) {
+          if (data.items.length === 0) {
+            state.items = DEFAULT_ITEMS.map((it, i) => normalizeItem(it, i));
+            state.categories = (Array.isArray(data.categories) && data.categories.length > 0)
+              ? data.categories
+              : DEFAULT_CATEGORIES.map(c => ({ ...c }));
+          } else {
+            state.items = data.items.map((it, i) => normalizeItem(it, i));
+            const baseCats = (Array.isArray(data.categories) && data.categories.length > 0)
+              ? data.categories
+              : DEFAULT_CATEGORIES;
+            state.categories = mergeCategoriesFromItems(baseCats, state.items);
+          }
+        }
+        // Fallback si réponse inattendue
+        else {
+          state.items = DEFAULT_ITEMS.map((it, i) => normalizeItem(it, i));
+          state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+        }
+      } catch (err) {
+        state.r2Connected = false;
+        state.items = DEFAULT_ITEMS.map((it, i) => normalizeItem(it, i));
+        state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+      }
+
+      renderAll();
+      updateR2ToolsPanel();
+    }
+
+    async function saveCatalogToR2(silentSuccessMsg = "Catalogue enregistré sur Cloudflare R2 !") {
+      try {
+        const res = await fetch(`${WORKER_URL}/catalog.json`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Pin": ADMIN_PIN
+          },
+          body: JSON.stringify({
+            items: state.items,
+            categories: state.categories
+          })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        state.r2Connected = true;
+        showToast(silentSuccessMsg);
+        renderAll();
+        renderAdminTitlesList();
+        renderAdminCategoriesList();
+        populateCategoryDropdown();
+        updateR2ToolsPanel();
+        return true;
+      } catch (err) {
+        showToast(`Erreur sauvegarde R2 (${err.message})`, true);
+        return false;
+      }
+    }
+
+    async function uploadMediaToR2(file, kind) {
+      const map = {
+        poster: { stat: "stat-poster", input: "f-posterUrl", prev: "prev-poster", label: "2:3" },
+        banner: { stat: "stat-banner", input: "f-bannerUrl", prev: "prev-banner", label: "16:9" },
+        video:  { stat: "stat-video",  input: "f-videoUrl",  prev: null, label: "" }
+      }[kind];
+
+      const statEl = document.getElementById(map.stat);
+      const urlEl = document.getElementById(map.input);
+      const mb = (file.size / (1024 * 1024)).toFixed(2);
+
+      statEl.textContent = `⏳ Upload vers R2 en cours (${mb} Mo)...`;
+      statEl.className = "text-xs text-amber-300 font-semibold animate-pulse";
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch(`${WORKER_URL}/upload`, {
+          method: "POST",
+          headers: { "X-Admin-Pin": ADMIN_PIN },
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) throw new Error(data.error || `HTTP ${res.status}`);
+
+        urlEl.value = data.url;
+        if (map.prev) updateMediaPreview(map.prev, data.url, map.label);
+
+        statEl.textContent = `✅ Uploadé sur R2 : ${file.name}`;
+        statEl.className = "text-xs text-emerald-400 font-semibold";
+        showToast("Média uploadé sur Cloudflare R2 !");
+      } catch (err) {
+        statEl.textContent = `❌ Échec upload (${err.message})`;
+        statEl.className = "text-xs text-[#E50914] font-semibold";
+        showToast("Échec de l'upload R2", true);
+      }
+    }
+
+    /*************************************************************************
+     * ÉCRAN PROFILS ("QUI EST-CE ?")
+     *************************************************************************/
+    function renderProfilesScreen() {
+      const grid = document.getElementById("profiles-grid");
+      grid.innerHTML = "";
+      PROFILES.forEach((p, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `profile-tile group flex flex-col items-center focus:outline-none ${idx === state.profileFocusIdx ? "tv-focus-profile" : ""}`;
+        btn.dataset.pidx = idx;
+        btn.innerHTML = `
+          <div class="profile-avatar w-28 h-28 sm:w-36 sm:h-36 rounded-md bg-gradient-to-br ${p.color} border-4 border-transparent flex items-center justify-center shadow-2xl transition-all duration-200 relative overflow-hidden">
+            <span class="font-display text-6xl sm:text-7xl text-white/95 drop-shadow">${p.initial}</span>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/10"></div>
+          </div>
+          <span class="profile-name mt-3 text-base sm:text-lg text-neutral-400 font-medium transition-colors">${p.name}</span>
+        `;
+        btn.onclick = () => selectProfile(p);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectProfile(profile) {
+      state.activeProfile = profile;
+      loadMyList();
+      document.getElementById("nav-profile-avatar").textContent = profile.initial;
+      document.getElementById("nav-profile-avatar").className = `w-8 h-8 rounded overflow-hidden flex items-center justify-center font-bold text-sm bg-gradient-to-br ${profile.color} text-white border border-white/20`;
+      document.getElementById("dropdown-profile-name").textContent = profile.name;
+
+      // Joue le son Tudum + flash cinématographique
+      playTudumSound();
+      const overlay = document.getElementById("tudum-overlay");
+      const wrap = document.getElementById("tudum-logo-wrap");
+      overlay.classList.remove("hidden");
+      wrap.classList.remove("animate-tudum");
+      void wrap.offsetWidth;
+      wrap.classList.add("animate-tudum");
+
+      document.getElementById("screen-profiles").classList.add("hidden");
+      state.focusArea = "hero";
+
+      setTimeout(() => {
+        overlay.classList.add("hidden");
+      }, 1450);
+
+      renderAll();
+    }
+
+    /*************************************************************************
+     * RENDU : HERO BANNER & CARROUSELS NETFLIX
+     *************************************************************************/
+    function renderHero() {
+      const heroEl = document.getElementById("hero-banner");
+      const isSearching = state.searchQuery.trim().length > 0 || state.navFilter === "MYLIST";
+      heroEl.classList.toggle("hidden", isSearching);
+      if (isSearching) return;
+
+      const pool = (state.navFilter === "Série" || state.navFilter === "Film")
+        ? state.items.filter(i => i.type === state.navFilter)
+        : state.items;
+
+      const featured = pool.find(i => i.featured) || state.items.find(i => i.featured) || pool[0] || state.items[0];
+      if (!featured) return;
+      state.heroItem = featured;
+
+      const heroImg = featured.bannerUrl || featured.posterUrl;
+      const mediaBox = document.getElementById("hero-media");
+      if (heroImg) {
+        mediaBox.innerHTML = `<img src="${escapeHtml(heroImg)}" alt="${escapeHtml(featured.title)}" class="w-full h-full object-cover object-center" />`;
+        const img = mediaBox.querySelector("img");
+        img.onerror = () => { mediaBox.innerHTML = buildFallbackGraphic(featured, true); };
+      } else {
+        mediaBox.innerHTML = buildFallbackGraphic(featured, true);
+      }
+
+      const origRow = document.getElementById("hero-original-row");
+      origRow.classList.toggle("hidden", !featured.isOriginal);
+      document.getElementById("hero-original-text").textContent =
+        featured.type === "Film" ? "FILM ORIGINAL FLOKS'IX" : "SÉRIE ORIGINALE FLOKS'IX";
+
+      document.getElementById("hero-title").textContent = featured.title;
+      document.getElementById("hero-synopsis").textContent = featured.synopsis || "";
+      document.getElementById("hero-meta").innerHTML = `
+        <span class="text-[#46d369] font-bold">Recommandé à ${featured.match || 98} %</span>
+        <span class="text-neutral-200">${featured.year}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-[11px] text-neutral-100 rounded-sm">${escapeHtml(featured.rating)}</span>
+        <span class="text-neutral-200">${escapeHtml(featured.duration)}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-[10px] font-bold text-neutral-200 rounded-sm">HD</span>
+      `;
+    }
+
+    function createCardElement(item, isVertical, rowIdx, colIdx) {
+      const imgUrl = isVertical
+        ? (item.posterUrl || item.bannerUrl)
+        : (item.bannerUrl || item.posterUrl);
+
+      const card = document.createElement("div");
+      card.tabIndex = 0;
+      card.dataset.row = rowIdx;
+      card.dataset.col = colIdx;
+      card.className = isVertical
+        ? "nf-card carousel-card shrink-0 w-36 sm:w-44 md:w-48 aspect-[2/3] rounded-md overflow-hidden relative bg-[#181818] cursor-pointer focus:outline-none"
+        : "nf-card carousel-card shrink-0 w-56 sm:w-64 md:w-72 aspect-video rounded-md overflow-hidden relative bg-[#181818] cursor-pointer focus:outline-none";
+
+      const badgeF = item.isOriginal
+        ? `<span class="absolute top-2 left-2.5 z-20 font-display text-2xl text-[#E50914] drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] leading-none">F</span>`
+        : "";
+
+      const mediaHtml = imgUrl
+        ? `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover" />`
+        : buildFallbackGraphic(item, false);
+
+      card.innerHTML = `
+        <div class="card-media w-full h-full relative">${mediaHtml}</div>
+        ${badgeF}
+        <div class="card-hover-info absolute inset-0 z-20 bg-gradient-to-t from-black/95 via-black/55 to-transparent p-3 flex flex-col justify-end">
+          <div class="font-bold text-xs sm:text-sm text-white leading-tight truncate mb-1">${escapeHtml(item.title)}</div>
+          <div class="flex items-center gap-1.5 text-[10px] font-semibold mb-1.5">
+            <span class="text-[#46d369]">${item.match || 98} %</span>
+            <span class="px-1 border border-neutral-400 text-neutral-200 rounded-sm">${escapeHtml(item.rating)}</span>
+            <span class="text-neutral-300 truncate">${escapeHtml(item.duration)}</span>
+          </div>
+          <div class="text-[10px] text-neutral-300 truncate mb-2">${escapeHtml(item.genres || "")}</div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="card-play-btn w-7 h-7 rounded-full bg-white text-black hover:bg-neutral-200 flex items-center justify-center transition" title="Lecture">
+              <svg class="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button type="button" class="card-info-btn w-7 h-7 rounded-full bg-neutral-800/90 hover:bg-neutral-700 border border-white/40 text-white flex items-center justify-center transition" title="Plus d'infos">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Sécurité anti-image cassée
+      const imgTag = card.querySelector("img");
+      if (imgTag) {
+        imgTag.onerror = () => {
+          card.querySelector(".card-media").innerHTML = buildFallbackGraphic(item, false);
+        };
+      }
+
+      card.addEventListener("click", (e) => {
+        if (e.target.closest(".card-play-btn")) {
+          e.stopPropagation();
+          openPlayer(item);
+        } else {
+          openDetailModal(item);
+        }
+      });
+
+      return card;
+    }
+
+    function renderCatalogView() {
+      const searchSec = document.getElementById("search-results-section");
+      const rowsSec = document.getElementById("rows-container");
+      const q = state.searchQuery.trim().toLowerCase();
+
+      // Mode Recherche ou "Ma liste"
+      if (q.length > 0 || state.navFilter === "MYLIST") {
+        rowsSec.classList.add("hidden");
+        searchSec.classList.remove("hidden");
+        const grid = document.getElementById("search-results-grid");
+        grid.innerHTML = "";
+
+        const matched = state.items.filter(item => {
+          if (state.navFilter === "MYLIST" && !state.myListIds.includes(item.id)) return false;
+          if (!q) return true;
+          return (
+            item.title.toLowerCase().includes(q) ||
+            (item.cast || "").toLowerCase().includes(q) ||
+            (item.genres || "").toLowerCase().includes(q) ||
+            (item.category || "").toLowerCase().includes(q) ||
+            (item.synopsis || "").toLowerCase().includes(q)
+          );
+        });
+
+        document.getElementById("search-results-title").textContent =
+          state.navFilter === "MYLIST" && !q
+            ? `Ma liste (${matched.length})`
+            : `Résultats pour « ${state.searchQuery} » (${matched.length})`;
+
+        if (matched.length === 0) {
+          grid.innerHTML = `<p class="col-span-full text-neutral-400 text-sm py-8">Aucun titre trouvé.</p>`;
+          return;
+        }
+
+        matched.forEach((item, idx) => {
+          const card = createCardElement(item, false, 0, idx);
+          card.classList.remove("shrink-0", "w-56", "sm:w-64", "md:w-72");
+          card.classList.add("w-full");
+          grid.appendChild(card);
+        });
+        return;
+      }
+
+      // Mode Carrousels par catégories
+      searchSec.classList.add("hidden");
+      rowsSec.classList.remove("hidden");
+      rowsSec.innerHTML = "";
+
+      const filteredPool = (state.navFilter === "Série" || state.navFilter === "Film")
+        ? state.items.filter(i => i.type === state.navFilter)
+        : state.items;
+
+      const visibleRows = [];
+      state.categories.forEach(cat => {
+        const itemsInCat = filteredPool.filter(i => i.category === cat.name);
+        // Masquer automatiquement les catégories vides sur l'accueil
+        if (itemsInCat.length > 0) {
+          visibleRows.push({ ...cat, items: itemsInCat });
+        }
+      });
+
+      state.renderedRows = visibleRows;
+
+      visibleRows.forEach((row, rIdx) => {
+        const isVert = row.format === "vertical";
+        const wrapper = document.createElement("div");
+        wrapper.className = "row-wrapper relative group";
+        wrapper.innerHTML = `
+          <h2 class="px-5 sm:px-12 text-base sm:text-xl font-bold text-neutral-100 mb-2.5 tracking-wide flex items-center gap-2">
+            ${isVert ? `<span class="text-[#E50914] font-display text-2xl leading-none">F</span>` : ""}
+            <span>${escapeHtml(row.name)}</span>
+          </h2>
+          <div class="relative">
+            <button type="button" class="row-arrow arrow-left opacity-0 hidden sm:flex items-center justify-center absolute left-0 top-0 bottom-0 z-30 w-12 bg-black/60 hover:bg-black/85 text-white transition-opacity">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="row-track flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar px-5 sm:px-12 py-4 scroll-smooth"></div>
+            <button type="button" class="row-arrow arrow-right opacity-0 hidden sm:flex items-center justify-center absolute right-0 top-0 bottom-0 z-30 w-12 bg-black/60 hover:bg-black/85 text-white transition-opacity">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        `;
+
+        const track = wrapper.querySelector(".row-track");
+        row.items.forEach((item, cIdx) => {
+          track.appendChild(createCardElement(item, isVert, rIdx, cIdx));
+        });
+
+        wrapper.querySelector(".arrow-left").onclick = () => {
+          track.scrollBy({ left: -Math.max(400, track.clientWidth * 0.78), behavior: "smooth" });
+        };
+        wrapper.querySelector(".arrow-right").onclick = () => {
+          track.scrollBy({ left: Math.max(400, track.clientWidth * 0.78), behavior: "smooth" });
+        };
+
+        rowsSec.appendChild(wrapper);
+      });
+    }
+
+    function renderAll() {
+      renderHero();
+      renderCatalogView();
+    }
+
+    /*************************************************************************
+     * MODALE "PLUS D'INFOS" & LECTEUR VIDÉO
+     *************************************************************************/
+    function updateDetailMyListBtn() {
+      if (!state.detailItem) return;
+      const inList = state.myListIds.includes(state.detailItem.id);
+      document.getElementById("detail-mylist-icon").textContent = inList ? "✓" : "+";
+      document.getElementById("detail-mylist-text").textContent = inList ? "Dans ma liste" : "Ma liste";
+    }
+
+    function openDetailModal(item) {
+      state.detailItem = item;
+      const bgUrl = item.bannerUrl || item.posterUrl;
+      const box = document.getElementById("detail-backdrop");
+      if (bgUrl) {
+        box.innerHTML = `<img src="${escapeHtml(bgUrl)}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover" />`;
+        box.querySelector("img").onerror = () => { box.innerHTML = buildFallbackGraphic(item, true); };
+      } else {
+        box.innerHTML = buildFallbackGraphic(item, true);
+      }
+
+      document.getElementById("detail-original-badge").classList.toggle("hidden", !item.isOriginal);
+      document.getElementById("detail-original-label").textContent =
+        item.type === "Film" ? "FILM ORIGINAL FLOKS'IX" : "SÉRIE ORIGINALE FLOKS'IX";
+      document.getElementById("detail-title").textContent = item.title;
+
+      document.getElementById("detail-meta").innerHTML = `
+        <span class="text-[#46d369] font-bold">Recommandé à ${item.match || 98} %</span>
+        <span class="text-neutral-200">${item.year}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-xs text-neutral-100 rounded-sm">${escapeHtml(item.rating)}</span>
+        <span class="text-neutral-200">${escapeHtml(item.duration)}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-[10px] font-bold text-neutral-200 rounded-sm">HD</span>
+      `;
+      document.getElementById("detail-synopsis").textContent = item.synopsis || "Aucun synopsis disponible.";
+      document.getElementById("detail-cast").textContent = item.cast || "Non renseignée";
+      document.getElementById("detail-genres").textContent = item.genres || "Non renseignés";
+      document.getElementById("detail-category").textContent = item.category || "Catalogue";
+      document.getElementById("detail-tags").textContent = item.tags || "Captivant";
+
+      updateDetailMyListBtn();
+      document.getElementById("modal-detail").classList.remove("hidden");
+    }
+
+    function closeDetailModal() {
+      document.getElementById("modal-detail").classList.add("hidden");
+    }
+
+    function openPlayer(item) {
+      closeDetailModal();
+      document.getElementById("player-title").textContent = item.title;
+      const video = document.getElementById("video-element");
+      const ph = document.getElementById("player-placeholder");
+
+      if (item.videoUrl) {
+        ph.classList.add("hidden");
+        video.classList.remove("hidden");
+        video.src = item.videoUrl;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.removeAttribute("src");
+        video.classList.add("hidden");
+        document.getElementById("player-placeholder-title").textContent = item.title;
+        ph.classList.remove("hidden");
+      }
+      document.getElementById("modal-player").classList.remove("hidden");
+    }
+
+    function closePlayer() {
+      const video = document.getElementById("video-element");
+      video.pause();
+      video.removeAttribute("src");
+      document.getElementById("modal-player").classList.add("hidden");
+    }
+
+    /*************************************************************************
+     * CODE PIN ADMIN (9999)
+     *************************************************************************/
+    const PIN_KEYS = ["1","2","3","4","5","6","7","8","9","⌫","0","✕"];
+
+    function openPinModal() {
+      document.getElementById("profile-dropdown").classList.add("hidden");
+      state.pinInput = "";
+      document.getElementById("pin-error").textContent = "";
+      const pad = document.getElementById("pin-keypad");
+      pad.innerHTML = "";
+      PIN_KEYS.forEach(k => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "h-12 rounded-lg bg-[#262626] hover:bg-neutral-700 text-white text-lg font-bold transition";
+        b.textContent = k;
+        b.onclick = () => pressPinKey(k);
+        pad.appendChild(b);
+      });
+      refreshPinBoxes();
+      document.getElementById("modal-pin").classList.remove("hidden");
+    }
+
+    function closePinModal() {
+      document.getElementById("modal-pin").classList.add("hidden");
+    }
+
+    function pressPinKey(k) {
+      if (k === "✕") { closePinModal(); return; }
+      if (k === "⌫") { state.pinInput = state.pinInput.slice(0, -1); refreshPinBoxes(); return; }
+      if (/^\d$/.test(k) && state.pinInput.length < 4) {
+        state.pinInput += k;
+        refreshPinBoxes();
+        if (state.pinInput.length === 4) {
+          if (state.pinInput === ADMIN_PIN) {
+            closePinModal();
+            openAdminStudio();
+          } else {
+            document.getElementById("pin-error").textContent = "Code PIN incorrect.";
+            const boxes = document.getElementById("pin-boxes");
+            boxes.classList.remove("animate-shake");
+            void boxes.offsetWidth;
+            boxes.classList.add("animate-shake");
+            setTimeout(() => { state.pinInput = ""; refreshPinBoxes(); }, 400);
+          }
+        }
+      }
+    }
+
+    function refreshPinBoxes() {
+      document.querySelectorAll(".pin-box").forEach((box, idx) => {
+        box.textContent = idx < state.pinInput.length ? "•" : "";
+        box.classList.toggle("border-[#E50914]", idx === state.pinInput.length);
+        box.classList.toggle("border-white", idx < state.pinInput.length);
+        box.classList.toggle("border-neutral-600", idx > state.pinInput.length);
+      });
+    }
+
+    /*************************************************************************
+     * STUDIO ADMIN — 3 ONGLETS (TITRES, CATÉGORIES, CLOUDFLARE R2)
+     *************************************************************************/
+    function openAdminStudio() {
+      document.getElementById("modal-admin").classList.remove("hidden");
+      switchAdminTab("titles");
+      populateCategoryDropdown();
+      renderAdminTitlesList();
+      renderAdminCategoriesList();
+      updateR2ToolsPanel();
+      if (state.items.length > 0) loadItemIntoAdminForm(state.items[0]);
+      else resetAdminTitleForm();
+    }
+
+    function closeAdminStudio() {
+      document.getElementById("modal-admin").classList.add("hidden");
+    }
+
+    function switchAdminTab(tab) {
+      ["titles", "categories", "tools"].forEach(t => {
+        document.getElementById(`admin-panel-${t}`).classList.toggle("hidden", t !== tab);
+      });
+      document.querySelectorAll(".admin-tab-btn").forEach(btn => {
+        const active = btn.dataset.adminTab === tab;
+        btn.className = `admin-tab-btn px-3.5 py-1.5 rounded-md transition ${active ? "bg-[#E50914] text-white" : "text-neutral-300 hover:text-white"}`;
+      });
+    }
+
+    function populateCategoryDropdown() {
+      const sel = document.getElementById("f-category");
+      const current = sel.value;
+      sel.innerHTML = "";
+      state.categories.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.name;
+        opt.textContent = `${c.name} (${c.format === "vertical" ? "2:3" : "16:9"})`;
+        sel.appendChild(opt);
+      });
+      if (current && state.categories.some(c => c.name === current)) sel.value = current;
+    }
+
+    function updateMediaPreview(boxId, url, placeholder) {
+      const box = document.getElementById(boxId);
+      if (url) {
+        box.innerHTML = `<img src="${escapeHtml(url)}" class="w-full h-full object-cover" />`;
+      } else {
+        box.innerHTML = `<span class="text-[11px] text-neutral-500">${placeholder}</span>`;
+      }
+    }
+
+    function renderAdminTitlesList() {
+      const q = (document.getElementById("admin-title-search").value || "").trim().toLowerCase();
+      const listEl = document.getElementById("admin-titles-list");
+      const activeId = document.getElementById("f-id").value;
+      listEl.innerHTML = "";
+
+      const filtered = state.items.filter(i =>
+        !q || i.title.toLowerCase().includes(q) || (i.category || "").toLowerCase().includes(q)
+      );
+      document.getElementById("admin-titles-count").textContent = state.items.length;
+
+      filtered.forEach(item => {
+        const thumb = item.posterUrl || item.bannerUrl;
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = `w-full flex items-center gap-3 p-2 rounded-lg text-left transition border ${
+          item.id === activeId ? "bg-[#E50914]/20 border-[#E50914]" : "bg-[#1e1e1e] hover:bg-[#262626] border-white/5"
+        }`;
+        row.innerHTML = `
+          <div class="w-9 h-12 rounded overflow-hidden bg-black shrink-0 flex items-center justify-center border border-white/10">
+            ${thumb ? `<img src="${escapeHtml(thumb)}" class="w-full h-full object-cover" />` : `<span class="font-display text-base text-[#E50914]">F</span>`}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold text-xs sm:text-sm text-white truncate">${escapeHtml(item.title)}</span>
+              ${item.featured ? `<span class="text-amber-400 text-xs shrink-0" title="En vedette">★</span>` : ""}
+            </div>
+            <div class="text-[11px] text-neutral-400 truncate">${escapeHtml(item.category)} • ${item.year}</div>
+          </div>
+        `;
+        row.onclick = () => loadItemIntoAdminForm(item);
+        listEl.appendChild(row);
+      });
+    }
+
+    function resetAdminTitleForm() {
+      document.getElementById("form-title-heading").textContent = "Nouveau titre";
+      document.getElementById("delete-title-wrap").classList.add("hidden");
+      document.getElementById("btn-confirm-delete-title").classList.add("hidden");
+      document.getElementById("f-id").value = "";
+      document.getElementById("f-title").value = "";
+      document.getElementById("f-type").value = "Série";
+      document.getElementById("f-year").value = 2026;
+      document.getElementById("f-duration").value = "1 saison";
+      document.getElementById("f-match").value = 98;
+      document.getElementById("f-rating").value = "16+";
+      populateCategoryDropdown();
+      document.getElementById("f-featured").checked = false;
+      document.getElementById("f-original").checked = true;
+      document.getElementById("f-cast").value = "";
+      document.getElementById("f-genres").value = "";
+      document.getElementById("f-tags").value = "";
+      document.getElementById("f-synopsis").value = "";
+      document.getElementById("f-posterUrl").value = "";
+      document.getElementById("f-bannerUrl").value = "";
+      document.getElementById("f-videoUrl").value = "";
+      document.getElementById("stat-poster").textContent = "Cliquer ou glisser une affiche 2:3";
+      document.getElementById("stat-poster").className = "text-xs text-neutral-300";
+      document.getElementById("stat-banner").textContent = "Cliquer ou glisser une bannière 16:9";
+      document.getElementById("stat-banner").className = "text-xs text-neutral-300";
+      document.getElementById("stat-video").textContent = "Cliquer ou glisser un fichier .mp4 vers Cloudflare R2";
+      document.getElementById("stat-video").className = "text-xs text-neutral-300";
+      updateMediaPreview("prev-poster", "", "2:3");
+      updateMediaPreview("prev-banner", "", "16:9");
+      renderAdminTitlesList();
+    }
+
+    function loadItemIntoAdminForm(item) {
+      document.getElementById("form-title-heading").textContent = `Modifier : ${item.title}`;
+      document.getElementById("delete-title-wrap").classList.remove("hidden");
+      document.getElementById("btn-confirm-delete-title").classList.add("hidden");
+      document.getElementById("f-id").value = item.id;
+      document.getElementById("f-title").value = item.title;
+      document.getElementById("f-type").value = item.type || "Série";
+      document.getElementById("f-year").value = item.year || 2026;
+      document.getElementById("f-duration").value = item.duration || "1 saison";
+      document.getElementById("f-match").value = item.match || 98;
+      document.getElementById("f-rating").value = item.rating || "16+";
+      populateCategoryDropdown();
+      document.getElementById("f-category").value = item.category;
+      document.getElementById("f-featured").checked = Boolean(item.featured);
+      document.getElementById("f-original").checked = Boolean(item.isOriginal);
+      document.getElementById("f-cast").value = item.cast || "";
+      document.getElementById("f-genres").value = item.genres || "";
+      document.getElementById("f-tags").value = item.tags || "";
+      document.getElementById("f-synopsis").value = item.synopsis || "";
+      document.getElementById("f-posterUrl").value = item.posterUrl || "";
+      document.getElementById("f-bannerUrl").value = item.bannerUrl || "";
+      document.getElementById("f-videoUrl").value = item.videoUrl || "";
+      updateMediaPreview("prev-poster", item.posterUrl, "2:3");
+      updateMediaPreview("prev-banner", item.bannerUrl, "16:9");
+      renderAdminTitlesList();
+    }
+
+    // === ONGLET CATÉGORIES ===
+    function renderAdminCategoriesList() {
+      const container = document.getElementById("admin-categories-list");
+      container.innerHTML = "";
+
+      state.categories.forEach((cat, idx) => {
+        const count = state.items.filter(i => i.category === cat.name).length;
+        const row = document.createElement("div");
+        row.className = "flex flex-wrap items-center gap-2.5 bg-[#1e1e1e] border border-white/10 rounded-xl p-3";
+        row.innerHTML = `
+          <div class="flex flex-col gap-1">
+            <button type="button" class="cat-up w-6 h-6 rounded bg-white/5 hover:bg-white/15 text-xs flex items-center justify-center ${idx === 0 ? "opacity-30 pointer-events-none" : ""}" title="Monter">▲</button>
+            <button type="button" class="cat-down w-6 h-6 rounded bg-white/5 hover:bg-white/15 text-xs flex items-center justify-center ${idx === state.categories.length - 1 ? "opacity-30 pointer-events-none" : ""}" title="Descendre">▼</button>
+          </div>
+          <input type="text" class="cat-name-input flex-1 min-w-[160px] bg-[#282828] border border-white/10 focus:border-[#E50914] rounded-lg px-3 py-1.5 text-sm text-white outline-none" value="${escapeHtml(cat.name)}" />
+          <select class="cat-format-select bg-[#282828] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none">
+            <option value="horizontal" ${cat.format === "horizontal" ? "selected" : ""}>Horizontal 16:9</option>
+            <option value="vertical" ${cat.format === "vertical" ? "selected" : ""}>Vertical 2:3</option>
+          </select>
+          <span class="text-xs text-neutral-400 px-2">${count} titre${count > 1 ? "s" : ""}</span>
+          <button type="button" class="cat-del px-3 py-1.5 rounded-lg bg-red-950/70 hover:bg-[#E50914] border border-red-500/30 text-red-200 hover:text-white text-xs font-bold transition">Supprimer</button>
+        `;
+
+        // Renommer une catégorie (met aussi à jour les titres liés)
+        const nameInput = row.querySelector(".cat-name-input");
+        nameInput.addEventListener("change", () => {
+          const oldName = cat.name;
+          const newName = nameInput.value.trim();
+          if (!newName || newName === oldName) { nameInput.value = oldName; return; }
+          cat.name = newName;
+          state.items.forEach(it => { if (it.category === oldName) it.category = newName; });
+          populateCategoryDropdown();
+          renderAll();
+          showToast(`Catégorie renommée en « ${newName} » (pensez à sauvegarder)`);
+        });
+
+        // Format 16:9 / 2:3
+        row.querySelector(".cat-format-select").addEventListener("change", (e) => {
+          cat.format = e.target.value;
+          renderAll();
+        });
+
+        // Monter / Descendre
+        row.querySelector(".cat-up").onclick = () => {
+          if (idx <= 0) return;
+          [state.categories[idx - 1], state.categories[idx]] = [state.categories[idx], state.categories[idx - 1]];
+          renderAdminCategoriesList();
+          renderAll();
+        };
+        row.querySelector(".cat-down").onclick = () => {
+          if (idx >= state.categories.length - 1) return;
+          [state.categories[idx + 1], state.categories[idx]] = [state.categories[idx], state.categories[idx + 1]];
+          renderAdminCategoriesList();
+          renderAll();
+        };
+
+        // Supprimer (2 clics inline, sans confirm() natif)
+        const delBtn = row.querySelector(".cat-del");
+        let armed = false;
+        delBtn.onclick = async () => {
+          if (!armed) {
+            armed = true;
+            delBtn.textContent = count > 0 ? `Confirmer (${count} titres déplacés)` : "Confirmer ?";
+            delBtn.classList.add("bg-[#E50914]", "text-white");
+            setTimeout(() => {
+              if (armed) {
+                armed = false;
+                delBtn.textContent = "Supprimer";
+                delBtn.classList.remove("bg-[#E50914]", "text-white");
+              }
+            }, 4000);
+            return;
+          }
+          const removedName = cat.name;
+          state.categories.splice(idx, 1);
+          const fallbackCat = state.categories[0] ? state.categories[0].name : "Non classé";
+          if (count > 0) {
+            if (!state.categories[0]) {
+              state.categories.push({ id: "cat-non-classe", name: "Non classé", format: "horizontal" });
+            }
+            state.items.forEach(it => {
+              if (it.category === removedName) it.category = fallbackCat;
+            });
+          }
+          await saveCatalogToR2(`Catégorie « ${removedName} » supprimée.`);
+        };
+
+        container.appendChild(row);
+      });
+    }
+
+    function updateR2ToolsPanel() {
+      const badge = document.getElementById("r2-status-badge");
+      badge.textContent = state.r2Connected ? "Connecté à R2" : "Mode local (fallback)";
+      badge.className = state.r2Connected
+        ? "px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+        : "px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      document.getElementById("r2-stats-line").textContent =
+        `${state.items.length} titres enregistrés • ${state.categories.length} catégories configurées.`;
+    }
+
+    function bindDropzone(dzId, fileId, kind) {
+      const dz = document.getElementById(dzId);
+      const input = document.getElementById(fileId);
+      dz.addEventListener("click", () => input.click());
+      input.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          uploadMediaToR2(e.target.files[0], kind);
+          input.value = "";
+        }
+      });
+      ["dragenter", "dragover"].forEach(ev => {
+        dz.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dz.classList.add("dropzone-dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach(ev => {
+        dz.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dz.classList.remove("dropzone-dragover");
+        });
+      });
+      dz.addEventListener("drop", (e) => {
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) uploadMediaToR2(f, kind);
+      });
+    }
+
+    /*************************************************************************
+     * ÉVÉNEMENTS UI & NAVIGATION CLAVIER / FIRE TV
+     *************************************************************************/
+    // Scroll navbar
+    window.addEventListener("scroll", () => {
+      const nav = document.getElementById("navbar");
+      if (window.scrollY > 40) {
+        nav.classList.add("bg-[#141414]");
+        nav.classList.remove("bg-gradient-to-b", "from-black/85", "to-transparent");
+      } else {
+        nav.classList.remove("bg-[#141414]");
+        nav.classList.add("bg-gradient-to-b", "from-black/85", "to-transparent");
+      }
+    });
+
+    // Logo : 5 clics rapides ouvrent le PIN Admin
+    document.getElementById("nav-brand-logo").addEventListener("click", () => {
+      state.logoClicks++;
+      clearTimeout(state.logoClickTimer);
+      state.logoClickTimer = setTimeout(() => { state.logoClicks = 0; }, 1600);
+      if (state.logoClicks >= 5) {
+        state.logoClicks = 0;
+        openPinModal();
+        return;
+      }
+      state.navFilter = "HOME";
+      state.searchQuery = "";
+      document.getElementById("search-input").value = "";
+      updateNavActiveStyles();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    function updateNavActiveStyles() {
+      document.querySelectorAll(".nav-link").forEach(btn => {
+        const active = btn.dataset.nav === state.navFilter;
+        btn.classList.toggle("text-white", active);
+        btn.classList.toggle("font-semibold", active);
+      });
+    }
+
+    document.querySelectorAll(".nav-link").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.navFilter = btn.dataset.nav;
+        updateNavActiveStyles();
+        renderAll();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    // Recherche
+    const searchInput = document.getElementById("search-input");
+    const searchClear = document.getElementById("search-clear-btn");
+    document.getElementById("search-toggle-btn").addEventListener("click", () => {
+      searchInput.focus();
+    });
+    searchInput.addEventListener("input", (e) => {
+      state.searchQuery = e.target.value;
+      searchClear.classList.toggle("hidden", !state.searchQuery);
+      renderAll();
+    });
+    searchClear.addEventListener("click", () => {
+      searchInput.value = "";
+      state.searchQuery = "";
+      searchClear.classList.add("hidden");
+      renderAll();
+    });
+
+    // Dropdown profil
+    document.getElementById("profile-menu-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.getElementById("profile-dropdown").classList.toggle("hidden");
+    });
+    document.addEventListener("click", () => {
+      document.getElementById("profile-dropdown").classList.add("hidden");
+    });
+    document.getElementById("btn-switch-profile").addEventListener("click", () => {
+      document.getElementById("screen-profiles").classList.remove("hidden");
+      state.focusArea = "profiles";
+      renderProfilesScreen();
+    });
+    document.getElementById("btn-replay-tudum").addEventListener("click", () => playTudumSound());
+    document.getElementById("btn-menu-admin").addEventListener("click", openPinModal);
+
+    // Hero & Modales
+    document.getElementById("hero-play-btn").addEventListener("click", () => state.heroItem && openPlayer(state.heroItem));
+    document.getElementById("hero-info-btn").addEventListener("click", () => state.heroItem && openDetailModal(state.heroItem));
+    document.getElementById("detail-close-btn").addEventListener("click", closeDetailModal);
+    document.getElementById("modal-detail").addEventListener("click", (e) => { if (e.target.id === "modal-detail") closeDetailModal(); });
+    document.getElementById("detail-play-btn").addEventListener("click", () => state.detailItem && openPlayer(state.detailItem));
+    document.getElementById("detail-mylist-btn").addEventListener("click", () => state.detailItem && toggleMyList(state.detailItem.id));
+    document.getElementById("player-close-btn").addEventListener("click", closePlayer);
+    document.getElementById("player-placeholder-close").addEventListener("click", closePlayer);
+    document.getElementById("pin-cancel-btn").addEventListener("click", closePinModal);
+    document.getElementById("admin-close-btn").addEventListener("click", closeAdminStudio);
+
+    // Onglets Admin
+    document.querySelectorAll(".admin-tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchAdminTab(btn.dataset.adminTab));
+    });
+    document.getElementById("btn-new-title").addEventListener("click", resetAdminTitleForm);
+    document.getElementById("admin-title-search").addEventListener("input", renderAdminTitlesList);
+
+    document.getElementById("f-posterUrl").addEventListener("input", (e) => updateMediaPreview("prev-poster", e.target.value.trim(), "2:3"));
+    document.getElementById("f-bannerUrl").addEventListener("input", (e) => updateMediaPreview("prev-banner", e.target.value.trim(), "16:9"));
+
+    // Soumission formulaire titre
+    document.getElementById("admin-title-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("f-id").value;
+      const title = document.getElementById("f-title").value.trim().toUpperCase();
+      if (!title) return;
+
+      const isFeatured = document.getElementById("f-featured").checked;
+      if (isFeatured) state.items.forEach(x => { x.featured = false; });
+
+      const itemObj = {
+        id: id || `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now().toString().slice(-4)}`,
+        title,
+        type: document.getElementById("f-type").value,
+        year: parseInt(document.getElementById("f-year").value, 10) || 2026,
+        duration: document.getElementById("f-duration").value.trim() || "1 saison",
+        match: parseInt(document.getElementById("f-match").value, 10) || 98,
+        rating: document.getElementById("f-rating").value,
+        category: document.getElementById("f-category").value,
+        isOriginal: document.getElementById("f-original").checked,
+        featured: isFeatured,
+        cast: document.getElementById("f-cast").value.trim(),
+        genres: document.getElementById("f-genres").value.trim(),
+        tags: document.getElementById("f-tags").value.trim(),
+        synopsis: document.getElementById("f-synopsis").value.trim(),
+        posterUrl: document.getElementById("f-posterUrl").value.trim(),
+        bannerUrl: document.getElementById("f-bannerUrl").value.trim(),
+        videoUrl: document.getElementById("f-videoUrl").value.trim()
+      };
+
+      const idx = state.items.findIndex(x => x.id === itemObj.id);
+      if (idx !== -1) state.items[idx] = itemObj;
+      else state.items.unshift(itemObj);
+
+      document.getElementById("f-id").value = itemObj.id;
+      document.getElementById("delete-title-wrap").classList.remove("hidden");
+      await saveCatalogToR2(`« ${itemObj.title} » enregistré sur R2 !`);
+    });
+
+    // Suppression titre (2 clics inline)
+    document.getElementById("btn-delete-title").addEventListener("click", () => {
+      document.getElementById("btn-confirm-delete-title").classList.toggle("hidden");
+    });
+    document.getElementById("btn-confirm-delete-title").addEventListener("click", async () => {
+      const id = document.getElementById("f-id").value;
+      if (!id) return;
+      state.items = state.items.filter(x => x.id !== id);
+      resetAdminTitleForm();
+      await saveCatalogToR2("Titre supprimé de R2.");
+    });
+
+    // Ajout catégorie
+    document.getElementById("form-add-category").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("new-cat-name").value.trim();
+      const format = document.getElementById("new-cat-format").value;
+      if (!name) return;
+      if (state.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast("Cette catégorie existe déjà.", true);
+        return;
+      }
+      state.categories.push({
+        id: `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now().toString().slice(-3)}`,
+        name,
+        format
+      });
+      document.getElementById("new-cat-name").value = "";
+      await saveCatalogToR2(`Catégorie « ${name} » ajoutée !`);
+    });
+
+    document.getElementById("btn-save-categories").addEventListener("click", async () => {
+      await saveCatalogToR2("Catégories sauvegardées sur Cloudflare R2 !");
+    });
+
+    // Fusion non destructive des 48 titres de démo
+    document.getElementById("btn-merge-demo").addEventListener("click", async () => {
+      const existingIds = new Set(state.items.map(i => i.id.toLowerCase()));
+      const existingTitles = new Set(state.items.map(i => i.title.trim().toLowerCase()));
+      const hasFeaturedAlready = state.items.some(i => i.featured);
+
+      let added = 0;
+      DEFAULT_ITEMS.forEach(demo => {
+        if (!existingIds.has(demo.id.toLowerCase()) && !existingTitles.has(demo.title.trim().toLowerCase())) {
+          state.items.push({
+            ...demo,
+            featured: hasFeaturedAlready ? false : demo.featured
+          });
+          added++;
+        }
+      });
+
+      // S'assurer que les catégories par défaut existent
+      state.categories = mergeCategoriesFromItems(state.categories, state.items);
+
+      if (added === 0) {
+        showToast("Tous les titres de démo sont déjà présents !");
+      } else {
+        await saveCatalogToR2(`${added} titres de démo fusionnés sans toucher à vos créations !`);
+      }
+    });
+
+    // Navigation Clavier & Télécommande Fire TV (Flèches, Entrée, Échap, Shift+A)
+    document.addEventListener("keydown", (e) => {
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(tag);
+
+      // Raccourci Shift+A -> PIN Admin
+      if (e.shiftKey && (e.key === "A" || e.key === "a") && !isTyping) {
+        e.preventDefault();
+        openPinModal();
+        return;
+      }
+
+      const pinOpen = !document.getElementById("modal-pin").classList.contains("hidden");
+      const adminOpen = !document.getElementById("modal-admin").classList.contains("hidden");
+      const detailOpen = !document.getElementById("modal-detail").classList.contains("hidden");
+      const playerOpen = !document.getElementById("modal-player").classList.contains("hidden");
+      const profilesOpen = !document.getElementById("screen-profiles").classList.contains("hidden");
+
+      if (pinOpen) {
+        if (/^\d$/.test(e.key)) pressPinKey(e.key);
+        else if (e.key === "Backspace") pressPinKey("⌫");
+        else if (e.key === "Escape") closePinModal();
+        return;
+      }
+
+      if (e.key === "Escape") {
+        if (playerOpen) { closePlayer(); return; }
+        if (detailOpen) { closeDetailModal(); return; }
+        if (adminOpen && !isTyping) { closeAdminStudio(); return; }
+      }
+
+      if (adminOpen || isTyping) return;
+
+      // Navigation sur l'écran Profils
+      if (profilesOpen) {
+        if (e.key === "ArrowRight") {
+          state.profileFocusIdx = (state.profileFocusIdx + 1) % PROFILES.length;
+          renderProfilesScreen();
+        } else if (e.key === "ArrowLeft") {
+          state.profileFocusIdx = (state.profileFocusIdx - 1 + PROFILES.length) % PROFILES.length;
+          renderProfilesScreen();
+        } else if (e.key === "Enter") {
+          selectProfile(PROFILES[state.profileFocusIdx]);
+        }
+        return;
+      }
+
+      if (playerOpen || detailOpen) return;
+
+      // Navigation sur l'accueil (Hero + Carrousels)
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"].includes(e.key)) {
+        e.preventDefault();
+        handleDpadHome(e.key);
+      }
+    });
+
+    function handleDpadHome(key) {
+      document.querySelectorAll(".tv-focus, .tv-focus-btn").forEach(el => el.classList.remove("tv-focus", "tv-focus-btn"));
+
+      if (state.focusArea === "hero") {
+        if (key === "ArrowRight") state.heroBtnIdx = 1;
+        else if (key === "ArrowLeft") state.heroBtnIdx = 0;
+        else if (key === "ArrowDown" && state.renderedRows.length > 0) {
+          state.focusArea = "rows"; state.rowIdx = 0; state.colIdx = 0;
+        } else if (key === "Enter") {
+          (state.heroBtnIdx === 0 ? document.getElementById("hero-play-btn") : document.getElementById("hero-info-btn")).click();
+          return;
+        }
+      } else if (state.focusArea === "rows") {
+        const curRow = state.renderedRows[state.rowIdx];
+        if (key === "ArrowRight" && curRow && state.colIdx < curRow.items.length - 1) state.colIdx++;
+        else if (key === "ArrowLeft" && state.colIdx > 0) state.colIdx--;
+        else if (key === "ArrowDown" && state.rowIdx < state.renderedRows.length - 1) {
+          state.rowIdx++;
+          state.colIdx = Math.min(state.colIdx, state.renderedRows[state.rowIdx].items.length - 1);
+        } else if (key === "ArrowUp") {
+          if (state.rowIdx > 0) {
+            state.rowIdx--;
+            state.colIdx = Math.min(state.colIdx, state.renderedRows[state.rowIdx].items.length - 1);
+          } else {
+            state.focusArea = "hero";
+          }
+        } else if (key === "Enter" && curRow && curRow.items[state.colIdx]) {
+          openDetailModal(curRow.items[state.colIdx]);
+          return;
+        }
+      }
+
+      if (state.focusArea === "hero") {
+        const btn = state.heroBtnIdx === 0 ? document.getElementById("hero-play-btn") : document.getElementById("hero-info-btn");
+        btn.classList.add("tv-focus-btn");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        const card = document.querySelector(`.carousel-card[data-row="${state.rowIdx}"][data-col="${state.colIdx}"]`);
+        if (card) {
+          card.classList.add("tv-focus");
+          card.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
+      }
+    }
+
+    /*************************************************************************
+     * DÉMARRAGE
+     *************************************************************************/
+    window.addEventListener("load", () => {
+      bindDropzone("dz-poster", "file-poster", "poster");
+      bindDropzone("dz-banner", "file-banner", "banner");
+      bindDropzone("dz-video", "file-video", "video");
+      renderProfilesScreen();
+      loadMyList();
+      fetchCatalogFromR2();
+    });
+  </script>
+</body>
+</html>
