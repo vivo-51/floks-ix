@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FLOKS'IX</title>
+
+  <!-- PWA & Mobile Fullscreen Meta Tags -->
+  <meta name="theme-color" content="#141414" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FLOKS'IX" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Bebas Neue -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --fx-red: #E50914;
+      --fx-red-hover: #f40612;
+      --fx-bg: #141414;
+      --fx-card: #181818;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--fx-bg);
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+    }
+
+    .font-display {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-wordmark {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      color: var(--fx-red);
+      letter-spacing: 0.08em;
+      text-shadow: 0 4px 20px rgba(229, 9, 20, 0.45);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Intro Splash Animations */
+    @keyframes ribbonReveal {
+      0% { transform: scale(0.72); opacity: 0; filter: brightness(0.4); }
+      22% { transform: scale(1); opacity: 1; filter: brightness(1.15); }
+      72% { transform: scale(1.06); opacity: 1; filter: brightness(1.25); }
+      100% { transform: scale(2.4); opacity: 0; filter: brightness(2.2); }
+    }
+    @keyframes wordmarkFade {
+      0% { opacity: 0; letter-spacing: 0.42em; transform: scale(0.92); }
+      28% { opacity: 1; letter-spacing: 0.14em; transform: scale(1); }
+      75% { opacity: 1; letter-spacing: 0.16em; transform: scale(1.04); }
+      100% { opacity: 0; letter-spacing: 0.34em; transform: scale(1.3); }
+    }
+    .animate-ribbon { animation: ribbonReveal 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .animate-wordmark { animation: wordmarkFade 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-7px); }
+      80% { transform: translateX(7px); }
+    }
+    .animate-shake { animation: shakeError 0.38s ease-in-out; }
+
+    /* Fire TV / Smart TV D-Pad Focus Rings */
+    .tv-focus {
+      outline: none !important;
+      box-shadow: 0 0 0 3.5px #ffffff, 0 14px 36px rgba(0, 0, 0, 0.9) !important;
+      transform: scale(1.06);
+      z-index: 30;
+    }
+    .tv-focus-btn {
+      outline: none !important;
+      box-shadow: 0 0 0 3px #ffffff, 0 0 22px rgba(255, 255, 255, 0.35) !important;
+      transform: scale(1.04);
+    }
+
+    .poster-card {
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease;
+    }
+    .poster-card:hover {
+      transform: scale(1.05);
+      z-index: 25;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.92), 0 12px 30px rgba(0, 0, 0, 0.85);
+    }
+
+    .hero-vignette-bottom {
+      background: linear-gradient(180deg, rgba(20,20,20,0.12) 0%, rgba(20,20,20,0.4) 52%, rgba(20,20,20,0.94) 86%, #141414 100%);
+    }
+    .hero-vignette-left {
+      background: linear-gradient(90deg, #141414 0%, rgba(20,20,20,0.88) 30%, rgba(20,20,20,0.3) 62%, rgba(20,20,20,0) 100%);
+    }
+
+    /* Dropzone: inner elements MUST NOT block click/drop */
+    .dropzone-box * {
+      pointer-events: none;
+    }
+    .dropzone-active {
+      border-color: #E50914 !important;
+      background-color: rgba(229, 9, 20, 0.14) !important;
+    }
+  </style>
+</head>
+<body class="bg-[#141414] text-white min-h-screen antialiased selection:bg-[#E50914] selection:text-white">
+
+  <!-- =========================================================
+       ÉCRAN 1 : INTRO "TUDUM" FLOKS'IX
+  ========================================================== -->
+  <section id="screen-splash" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center overflow-hidden cursor-pointer">
+    <div class="absolute inset-0 pointer-events-none"
+         style="background: radial-gradient(ellipse at center, rgba(229,9,20,0.34) 0%, rgba(120,0,10,0.12) 42%, rgba(0,0,0,0) 72%);"></div>
+
+    <div class="relative flex flex-col items-center justify-center">
+      <div class="animate-ribbon mb-4">
+        <svg width="104" height="142" viewBox="0 0 110 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_38px_rgba(229,9,20,0.85)]">
+          <defs>
+            <linearGradient id="fxRedLeft" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#B20710"/>
+              <stop offset="50%" stop-color="#E50914"/>
+              <stop offset="100%" stop-color="#8F040B"/>
+            </linearGradient>
+            <linearGradient id="fxRedBar" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#FF212E"/>
+              <stop offset="100%" stop-color="#B20710"/>
+            </linearGradient>
+          </defs>
+          <path d="M18 10H46V140L18 134V10Z" fill="url(#fxRedLeft)"/>
+          <path d="M18 10H96L90 36H18V10Z" fill="url(#fxRedBar)"/>
+          <path d="M46 62H84L79 86H46V62Z" fill="#E50914"/>
+        </svg>
+      </div>
+      <div class="animate-wordmark brand-wordmark text-6xl sm:text-8xl md:text-9xl">FLOKS'IX</div>
+    </div>
+
+    <button id="splash-start-btn" class="mt-8 px-6 py-2.5 rounded-full bg-white/10 hover:bg-[#E50914] border border-white/20 text-xs sm:text-sm font-semibold tracking-widest uppercase transition">
+      Lancer FLOKS'IX (avec son « Tudum »)
+    </button>
+  </section>
+
+  <!-- =========================================================
+       BARRE DE NAVIGATION SUPÉRIEURE
+  ========================================================== -->
+  <nav id="top-navbar" class="fixed top-0 left-0 right-0 z-40 px-4 sm:px-10 py-3.5 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/60 to-transparent transition-colors duration-300">
+    <div class="flex items-center gap-6 sm:gap-9">
+      <button id="nav-logo-btn" class="brand-wordmark text-3xl sm:text-4xl leading-none focus:outline-none">FLOKS'IX</button>
+      <div class="hidden md:flex items-center gap-5 text-sm font-medium text-neutral-300">
+        <button data-filter="ALL" class="nav-filter-btn text-white font-semibold hover:text-white transition">Accueil</button>
+        <button data-filter="ORIGINALS" class="nav-filter-btn hover:text-white transition">Originals</button>
+        <button data-filter="Missions & Enquêtes" class="nav-filter-btn hover:text-white transition">Missions & Enquêtes</button>
+        <button data-filter="Comédies & Parodies" class="nav-filter-btn hover:text-white transition">Comédies & Parodies</button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Recherche rapide -->
+      <div class="relative hidden sm:block">
+        <input id="quick-search" type="text" placeholder="Rechercher..."
+               class="w-40 lg:w-56 bg-black/60 border border-white/15 focus:border-white rounded-full pl-9 pr-3 py-1.5 text-xs text-white placeholder-neutral-400 outline-none transition" />
+        <svg class="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+
+      <!-- Bouton Tudum -->
+      <button id="btn-tudum-replay" title="Rejouer le son Tudum" class="p-2 rounded-full bg-white/5 hover:bg-white/15 text-neutral-300 hover:text-white transition">
+        <svg class="w-4 h-4 text-[#E50914]" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+      </button>
+
+      <!-- Icône Admin discrète -->
+      <button id="btn-open-admin-pin" title="Studio Admin (ou tapez 9999)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 text-neutral-400 hover:text-white text-xs font-medium transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="hidden sm:inline">Admin</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- =========================================================
+       CONTENU PRINCIPAL : HERO BANNER + CARROUSELS
+  ========================================================== -->
+  <main id="main-app" class="pb-24">
+    <!-- Hero Banner ("En vedette") -->
+    <header id="hero-section" class="relative w-full h-[76vh] sm:h-[84vh] min-h-[500px] overflow-hidden flex items-end pb-14 sm:pb-20 px-5 sm:px-12">
+      <div id="hero-backdrop" class="absolute inset-0 transition-all duration-500"></div>
+      <div class="hero-vignette-left absolute inset-0 pointer-events-none"></div>
+      <div class="hero-vignette-bottom absolute inset-0 pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="font-display text-2xl sm:text-3xl text-[#E50914] leading-none">F</span>
+          <span id="hero-badge-label" class="text-xs sm:text-sm font-bold tracking-[0.28em] text-neutral-200 uppercase">UNE PRODUCTION ORIGINALE FLOKS'IX</span>
+        </div>
+
+        <h1 id="hero-title" class="font-display text-5xl sm:text-7xl md:text-8xl leading-[0.92] text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.85)] mb-4">
+          SHERLOCK
+        </h1>
+
+        <div id="hero-meta" class="flex flex-wrap items-center gap-3 text-sm sm:text-base font-medium mb-4"></div>
+
+        <p id="hero-synopsis" class="text-sm sm:text-base md:text-lg text-neutral-200 leading-relaxed line-clamp-3 mb-7 drop-shadow"></p>
+
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <button id="hero-play-btn" class="hero-focusable flex items-center gap-2.5 bg-white text-black hover:bg-neutral-200 font-bold text-base sm:text-lg px-7 py-2.5 sm:py-3 rounded-md transition">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Lecture
+          </button>
+          <button id="hero-info-btn" class="hero-focusable flex items-center gap-2.5 bg-neutral-600/75 hover:bg-neutral-500/75 backdrop-blur-sm text-white font-semibold text-base sm:text-lg px-7 py-2.5 sm:py-3 rounded-md transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Plus d'infos
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Rangées / Carrousels -->
+    <section id="rows-container" class="relative z-10 -mt-6 sm:-mt-10 space-y-9 sm:space-y-11"></section>
+  </main>
+
+  <!-- =========================================================
+       MODALE DÉTAIL ("PLUS D'INFOS")
+  ========================================================== -->
+  <div id="modal-detail" class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm overflow-y-auto flex justify-center items-start p-3 sm:p-8">
+    <div class="relative w-full max-w-3xl bg-[#181818] rounded-xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-6 border border-white/10">
+      <button id="detail-close-btn" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/75 hover:bg-white hover:text-black text-white flex items-center justify-center transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+
+      <div class="relative h-64 sm:h-80 w-full overflow-hidden flex items-end p-6 sm:p-8">
+        <div id="detail-backdrop" class="absolute inset-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/40 to-transparent"></div>
+        <div class="relative z-10 w-full">
+          <div id="detail-original-badge" class="hidden flex items-center gap-1.5 mb-2">
+            <span class="font-display text-2xl text-[#E50914] leading-none">F</span>
+            <span class="text-xs font-bold tracking-[0.25em] text-neutral-300 uppercase">FLOKS'IX ORIGINAL</span>
+          </div>
+          <h2 id="detail-title" class="font-display text-4xl sm:text-6xl text-white drop-shadow mb-4"></h2>
+          <button id="detail-play-btn" class="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 font-bold px-7 py-2.5 rounded-md transition">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Lecture
+          </button>
+        </div>
+      </div>
+
+      <div class="px-6 sm:px-8 pb-8 pt-3 space-y-4">
+        <div id="detail-meta" class="flex flex-wrap items-center gap-3 text-sm font-medium"></div>
+        <p id="detail-synopsis" class="text-neutral-200 text-sm sm:text-base leading-relaxed"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       LECTEUR VIDÉO PLEIN ÉCRAN (HTML5 MP4)
+  ========================================================== -->
+  <section id="modal-player" class="hidden fixed inset-0 z-[80] bg-black flex flex-col items-center justify-center">
+    <div class="absolute top-0 left-0 right-0 z-20 p-4 sm:p-6 flex items-center justify-between bg-gradient-to-b from-black/85 to-transparent">
+      <button id="player-close-btn" class="flex items-center gap-2.5 text-white hover:text-neutral-300 font-semibold transition">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span id="player-title" class="text-base sm:text-xl font-bold"></span>
+      </button>
+      <span class="text-xs font-mono text-neutral-400 bg-black/60 border border-white/15 px-3 py-1 rounded">FLOKS'IX 4K</span>
+    </div>
+
+    <video id="video-element" class="w-full h-full max-h-screen object-contain bg-black" controls playsinline></video>
+
+    <div id="player-empty-msg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-black/90">
+      <div class="brand-wordmark text-5xl mb-3">FLOKS'IX</div>
+      <p class="text-neutral-300 text-base sm:text-lg max-w-md mb-6">
+        Aucune vidéo <code class="text-[#E50914]">.mp4</code> n'est encore associée à ce titre. Ajoute-la depuis le Studio Admin (PIN 9999).
+      </p>
+      <button id="player-empty-close" class="px-6 py-2.5 rounded-md bg-white text-black font-bold text-sm hover:bg-neutral-200 transition">
+        Fermer le lecteur
+      </button>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MODALE CODE PIN ADMIN (9999)
+  ========================================================== -->
+  <div id="modal-pin" class="hidden fixed inset-0 z-[90] bg-black/90 backdrop-blur-md flex items-center justify-center p-6">
+    <div class="max-w-sm w-full bg-[#181818] border border-white/15 rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+      <div class="text-xs uppercase tracking-[0.22em] text-[#E50914] font-bold mb-2">Accès Studio Admin</div>
+      <h2 class="text-xl font-bold text-white mb-1">Entrez le code PIN</h2>
+      <p id="pin-error" class="h-5 text-xs text-[#E50914] font-medium mb-4"></p>
+
+      <div id="pin-boxes" class="flex justify-center gap-3 mb-6">
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+        <div class="pin-box w-12 h-14 rounded-lg border-2 border-neutral-600 bg-[#111] flex items-center justify-center text-2xl font-bold"></div>
+      </div>
+
+      <div id="pin-keypad" class="grid grid-cols-3 gap-2.5 mb-5"></div>
+
+      <button id="pin-cancel-btn" class="text-xs uppercase tracking-widest text-neutral-400 hover:text-white transition">
+        Annuler (Échap)
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       STUDIO ADMIN CACHÉ (2 COLONNES — CLOUDFLARE R2)
+  ========================================================== -->
+  <section id="screen-admin" class="hidden fixed inset-0 z-[95] bg-[#0e0e0e] text-white overflow-y-auto">
+    <header class="sticky top-0 z-30 bg-[#141414]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-4">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span class="brand-wordmark text-2xl sm:text-3xl leading-none">FLOKS'IX</span>
+          <span class="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-neutral-300 border-l border-white/20 pl-3">STUDIO ADMIN R2</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button id="admin-new-top-btn" class="bg-[#E50914] hover:bg-[#f40612] text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition">
+            + Nouveau titre
+          </button>
+          <button id="admin-close-btn" class="bg-white text-black hover:bg-neutral-200 font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition">
+            Quitter Admin
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+      <!-- COLONNE GAUCHE : LISTE DES TITRES -->
+      <aside class="lg:col-span-4 bg-[#161616] border border-white/10 rounded-xl p-4 flex flex-col max-h-[82vh]">
+        <div class="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-neutral-300">
+            Catalogue (<span id="admin-count">0</span>)
+          </h2>
+          <button id="admin-add-btn" class="text-xs font-bold text-[#E50914] hover:underline">+ Nouveau titre</button>
+        </div>
+
+        <div id="admin-list" class="space-y-2 overflow-y-auto pr-1 flex-1"></div>
+      </aside>
+
+      <!-- COLONNE DROITE : FORMULAIRE D'ÉDITION & UPLOADS R2 -->
+      <div class="lg:col-span-8 bg-[#161616] border border-white/10 rounded-xl p-5 sm:p-6">
+        <form id="admin-form" class="space-y-6">
+          <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <h2 id="form-heading" class="text-lg sm:text-xl font-bold text-white">Ajouter un titre</h2>
+            <button type="button" id="btn-delete-item" class="hidden px-3 py-1.5 rounded-lg bg-red-950/70 hover:bg-[#E50914] border border-red-500/40 text-red-200 hover:text-white text-xs font-bold transition">
+              Supprimer ce titre
+            </button>
+          </div>
+
+          <input type="hidden" id="field-id" value="" />
+
+          <!-- Métadonnées -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Titre *</label>
+              <input id="field-title" type="text" required placeholder="Ex : SHERLOCK"
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Catégorie</label>
+              <select id="field-category" class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none">
+                <option value="Tendances actuelles">Tendances actuelles</option>
+                <option value="Missions & Enquêtes">Missions & Enquêtes</option>
+                <option value="Comédies & Parodies">Comédies & Parodies</option>
+                <option value="Films & Séries cultes">Films & Séries cultes</option>
+                <option value="Archives Classifiées">Archives Classifiées</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Année</label>
+              <input id="field-year" type="number" value="2026" min="1950" max="2035"
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Durée</label>
+              <input id="field-duration" type="text" value="1 h 45 min" placeholder="Ex : 4 saisons ou 2 h 10 min"
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Âge requis</label>
+              <select id="field-rating" class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none">
+                <option value="Tout public">Tout public</option>
+                <option value="12+">12+</option>
+                <option value="16+" selected>16+</option>
+                <option value="18+">18+</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1.5">Synopsis</label>
+              <textarea id="field-synopsis" rows="3" placeholder="Résumé du film ou indice de mission..."
+                        class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-4 py-2.5 text-sm text-white outline-none resize-y"></textarea>
+            </div>
+          </div>
+
+          <!-- Toggles Vedette & Originals -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#1d1d1d] p-4 rounded-xl border border-white/10">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input id="field-featured" type="checkbox" class="mt-0.5 w-4 h-4 accent-[#E50914] rounded shrink-0" />
+              <span class="text-sm font-medium text-neutral-100 leading-snug">
+                <strong class="text-amber-400">★ Mettre en vedette</strong><br/>
+                <span class="text-xs text-neutral-400">Bannière principale en haut de l'écran</span>
+              </span>
+            </label>
+
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input id="field-original" type="checkbox" class="mt-0.5 w-4 h-4 accent-[#E50914] rounded shrink-0" />
+              <span class="text-sm font-medium text-neutral-100 leading-snug">
+                <strong class="text-[#E50914]">Originals FLOKS'IX</strong><br/>
+                <span class="text-xs text-neutral-400">Afficher dans la rangée verticale (2:3)</span>
+              </span>
+            </label>
+          </div>
+
+          <!-- DEUX ZONES D'UPLOAD IMAGES (VERTICALE 2:3 + HORIZONTALE 16:9) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- 1. AFFICHE VERTICALE 2:3 -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-neutral-300">
+                Affiche Verticale (2:3) — Rangée Originals
+              </label>
+              <input id="input-file-vertical" type="file" accept="image/*" class="hidden" />
+              <div id="dropzone-vertical" class="dropzone-box border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-3.5 text-center cursor-pointer transition bg-[#1c1c1c]">
+                <div id="preview-vertical" class="w-28 aspect-[2/3] mx-auto rounded-lg overflow-hidden bg-black/60 mb-2.5 flex items-center justify-center border border-white/10">
+                  <span class="text-[11px] text-neutral-500 px-2">Format 2:3</span>
+                </div>
+                <p id="status-vertical" class="text-xs text-neutral-300 font-medium">Cliquer ou glisser une image (2:3)</p>
+              </div>
+              <input id="field-poster-vertical" type="url" placeholder="URL R2 de l'affiche verticale..."
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+            </div>
+
+            <!-- 2. BANNIÈRE HORIZONTALE 16:9 -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-neutral-300">
+                Bannière Horizontale (16:9) — Rangées & Vedette
+              </label>
+              <input id="input-file-horizontal" type="file" accept="image/*" class="hidden" />
+              <div id="dropzone-horizontal" class="dropzone-box border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-3.5 text-center cursor-pointer transition bg-[#1c1c1c]">
+                <div id="preview-horizontal" class="w-full aspect-video rounded-lg overflow-hidden bg-black/60 mb-2.5 flex items-center justify-center border border-white/10">
+                  <span class="text-[11px] text-neutral-500 px-2">Format 16:9</span>
+                </div>
+                <p id="status-horizontal" class="text-xs text-neutral-300 font-medium">Cliquer ou glisser une image (16:9)</p>
+              </div>
+              <input id="field-poster-horizontal" type="url" placeholder="URL R2 de la bannière horizontale..."
+                     class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+            </div>
+          </div>
+
+          <!-- UPLOAD VIDÉO MP4 -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-300">
+              Vidéo / Bande-annonce (.mp4)
+            </label>
+            <input id="input-file-video" type="file" accept="video/mp4,video/*" class="hidden" />
+            <div id="dropzone-video" class="dropzone-box border-2 border-dashed border-white/20 hover:border-[#E50914] rounded-xl p-4 text-center cursor-pointer transition bg-[#1c1c1c] flex flex-col items-center justify-center">
+              <svg class="w-7 h-7 text-[#E50914] mb-1.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <p id="status-video" class="text-xs text-neutral-300 font-medium">Cliquer ou glisser un fichier .mp4 pour l'uploader sur R2</p>
+            </div>
+            <input id="field-video-url" type="url" placeholder="URL R2 de la vidéo .mp4..."
+                   class="w-full bg-[#222] border border-white/15 focus:border-[#E50914] rounded-lg px-3 py-2 text-xs text-white outline-none" />
+          </div>
+
+          <!-- Bouton de sauvegarde -->
+          <div class="pt-2">
+            <button type="submit" id="btn-save-publish" class="w-full bg-[#E50914] hover:bg-[#f40612] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-red-900/30 transition text-sm sm:text-base">
+              Enregistrer & Publier sur R2
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="global-toast" class="pointer-events-none fixed bottom-5 right-5 z-[110] opacity-0 translate-y-3 transition-all duration-300 bg-[#181818]/95 border border-white/20 backdrop-blur-md text-white text-xs sm:text-sm px-4 py-3 rounded-lg shadow-2xl flex items-center gap-2.5 max-w-sm">
+    <span id="toast-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toast-msg">Catalogue synchronisé sur Cloudflare R2 !</span>
+  </div>
+
+  <!-- =========================================================
+       LOGIQUE APPLICATIVE
+  ========================================================== -->
+  <script>
+    /*************************************************************************
+     * CONFIGURATION INFRASTRUCTURE (HARDCODÉE)
+     *************************************************************************/
+    const WORKER_URL = "https://dry-rice-2542floksfix-admin.vivienazzam.workers.dev";
+    const R2_PUBLIC_URL = "https://pub-338355ba164c4a94b7b8071fed0692c4.r2.dev";
+    const ADMIN_PIN = "9999";
+
+    const DEFAULT_CATALOG = [
+      {
+        id: "sherlock",
+        title: "SHERLOCK",
+        category: "Missions & Enquêtes",
+        year: 2026,
+        duration: "4 saisons",
+        rating: "12+",
+        synopsis: "Dans un Londres moderne et brumeux, deux enquêteurs hors normes résolvent les affaires les plus impossibles de Scotland Yard.",
+        isFeatured: true,
+        isOriginal: true,
+        posterVerticalUrl: "",
+        posterHorizontalUrl: "",
+        videoUrl: "",
+        palette: ["#0f2942", "#06111c", "#38bdf8"]
+      },
+      {
+        id: "protocole-floksi",
+        title: "PROTOCOLE FLOKSI",
+        category: "Missions & Enquêtes",
+        year: 2026,
+        duration: "1 saison",
+        rating: "16+",
+        synopsis: "Une transmission cryptée pirate l'écran d'un salon genevois. Chaque épisode cache un indice réel à décoder avant minuit.",
+        isFeatured: false,
+        isOriginal: true,
+        posterVerticalUrl: "",
+        posterHorizontalUrl: "",
+        videoUrl: "",
+        palette: ["#8f000b", "#1c0508", "#ff2e3b"]
+      },
+      {
+        id: "operation-minuit",
+        title: "OPÉRATION MINUIT",
+        category: "Tendances actuelles",
+        year: 2026,
+        duration: "1 h 48 min",
+        rating: "12+",
+        synopsis: "Deux complices doivent rassembler quatre fragments d'un mystère avant que l'horloge ne sonne douze coups.",
+        isFeatured: false,
+        isOriginal: true,
+        posterVerticalUrl: "",
+        posterHorizontalUrl: "",
+        videoUrl: "",
+        palette: ["#1e1b4b", "#070618", "#6366f1"]
+      },
+      {
+        id: "la-pizz-della-pive",
+        title: "LA PIZZ' DELLA PIVE",
+        category: "Comédies & Parodies",
+        year: 2026,
+        duration: "52 min",
+        rating: "Tout public",
+        synopsis: "Plongée haletante dans les coulisses d'une fermentation 48 heures à 67 % d'hydratation. Tension maximale à la sortie du four.",
+        isFeatured: false,
+        isOriginal: false,
+        posterVerticalUrl: "",
+        posterHorizontalUrl: "",
+        videoUrl: "",
+        palette: ["#78350f", "#1c0b03", "#f59e0b"]
+      }
+    ];
+
+    const PALETTES = [
+      ["#0f2942", "#06111c", "#38bdf8"],
+      ["#8f000b", "#1c0508", "#ff2e3b"],
+      ["#064e3b", "#021a14", "#10b981"],
+      ["#3b0764", "#0b0214", "#c084fc"],
+      ["#78350f", "#1c0b03", "#f59e0b"],
+      ["#1e1b4b", "#070618", "#6366f1"]
+    ];
+
+    const state = {
+      catalog: [],
+      filter: "ALL",
+      searchQuery: "",
+      heroItem: null,
+      detailItem: null,
+      pinInput: "",
+      secretKeyBuffer: "",
+      tudumPlayed: false,
+      focusZone: "hero", // hero | rows
+      heroBtnIdx: 0,
+      rowIdx: 0,
+      colIdx: 0,
+      renderedRows: []
+    };
+
+    /*************************************************************************
+     * TOAST & AUDIO "TUDUM" (WEB AUDIO API)
+     *************************************************************************/
+    let toastTimer = null;
+    function showToast(msg, isError = false) {
+      const el = document.getElementById("global-toast");
+      const dot = document.getElementById("toast-dot");
+      document.getElementById("toast-msg").textContent = msg;
+      dot.className = `w-2.5 h-2.5 rounded-full shrink-0 ${isError ? "bg-[#E50914]" : "bg-emerald-400"}`;
+      el.classList.remove("opacity-0", "translate-y-3");
+      el.classList.add("opacity-100", "translate-y-0");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add("opacity-0", "translate-y-3");
+        el.classList.remove("opacity-100", "translate-y-0");
+      }, 3400);
+    }
+
+    let audioCtx = null;
+    function playTudum(force = false) {
+      if (state.tudumPlayed && !force) return;
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) audioCtx = new Ctx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        state.tudumPlayed = true;
+
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const g1 = audioCtx.createGain();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(125, now);
+        osc1.frequency.exponentialRampToValueAtTime(42, now + 0.22);
+        g1.gain.setValueAtTime(0.001, now);
+        g1.gain.linearRampToValueAtTime(0.65, now + 0.02);
+        g1.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+        osc1.connect(g1).connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.36);
+
+        const t2 = now + 0.25;
+        [
+          { f: 55, type: "triangle", peak: 0.58, dur: 1.8, drop: 38 },
+          { f: 110, type: "sine", peak: 0.24, dur: 2.2 },
+          { f: 164.81, type: "sine", peak: 0.14, dur: 2.3 }
+        ].forEach(h => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = h.type;
+          osc.frequency.setValueAtTime(h.f, t2);
+          if (h.drop) osc.frequency.exponentialRampToValueAtTime(h.drop, t2 + 1.4);
+          g.gain.setValueAtTime(0.001, t2);
+          g.gain.linearRampToValueAtTime(h.peak, t2 + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.0008, t2 + h.dur);
+          osc.connect(g).connect(audioCtx.destination);
+          osc.start(t2);
+          osc.stop(t2 + h.dur + 0.1);
+        });
+      } catch {}
+    }
+
+    /*************************************************************************
+     * API CLOUDFLARE WORKER (GET /catalog, PUT /catalog, POST /upload)
+     *************************************************************************/
+    function normalizeCatalog(items) {
+      return items.map((item, idx) => ({
+        id: item.id || `title-${Date.now()}-${idx}`,
+        title: item.title || "SANS TITRE",
+        category: item.category || "Tendances actuelles",
+        year: item.year || 2026,
+        duration: item.duration || "1 h 45 min",
+        rating: item.rating || "16+",
+        synopsis: item.synopsis || "",
+        isFeatured: Boolean(item.isFeatured || item.isHero),
+        isOriginal: Boolean(item.isOriginal),
+        posterVerticalUrl: item.posterVerticalUrl || item.posterUrl || "",
+        posterHorizontalUrl: item.posterHorizontalUrl || item.posterUrl || "",
+        videoUrl: item.videoUrl || "",
+        palette: item.palette || PALETTES[idx % PALETTES.length]
+      }));
+    }
+
+    async function fetchCatalog() {
+      try {
+        const res = await fetch(`${WORKER_URL}/catalog?t=${Date.now()}`, { method: "GET" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            state.catalog = normalizeCatalog(data);
+            renderAll();
+            return;
+          }
+        }
+      } catch {}
+      state.catalog = normalizeCatalog(DEFAULT_CATALOG);
+      renderAll();
+    }
+
+    async function saveCatalogToR2() {
+      const btn = document.getElementById("btn-save-publish");
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Synchronisation sur Cloudflare R2...";
+      try {
+        const res = await fetch(`${WORKER_URL}/catalog`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Pin": ADMIN_PIN
+          },
+          body: JSON.stringify(state.catalog)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast("Catalogue synchronisé sur Cloudflare R2 !");
+        renderAll();
+        renderAdminList();
+      } catch (err) {
+        showToast(`Erreur Cloudflare (${err.message})`, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+    }
+
+    async function uploadFileToR2(file, type) {
+      const statusMap = {
+        vertical: document.getElementById("status-vertical"),
+        horizontal: document.getElementById("status-horizontal"),
+        video: document.getElementById("status-video")
+      };
+      const inputMap = {
+        vertical: document.getElementById("field-poster-vertical"),
+        horizontal: document.getElementById("field-poster-horizontal"),
+        video: document.getElementById("field-video-url")
+      };
+
+      const statusEl = statusMap[type];
+      const urlInput = inputMap[type];
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+      statusEl.textContent = `⏳ Upload vers R2 en cours (${sizeMB} Mo)...`;
+      statusEl.className = "text-xs text-amber-300 font-semibold animate-pulse";
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch(`${WORKER_URL}/upload`, {
+          method: "POST",
+          headers: { "X-Admin-Pin": ADMIN_PIN },
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok || !data.url) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+
+        urlInput.value = data.url;
+        if (type === "vertical") updatePreview("preview-vertical", data.url, "Format 2:3");
+        if (type === "horizontal") updatePreview("preview-horizontal", data.url, "Format 16:9");
+
+        statusEl.textContent = `✅ Uploadé sur R2 : ${file.name}`;
+        statusEl.className = "text-xs text-emerald-400 font-semibold";
+        showToast("Fichier uploadé sur Cloudflare R2 !");
+      } catch (err) {
+        statusEl.textContent = `❌ Échec upload (${err.message})`;
+        statusEl.className = "text-xs text-[#E50914] font-semibold";
+        showToast("Échec de l'upload vers Cloudflare R2", true);
+      }
+    }
+
+    /*************************************************************************
+     * RENDU : HERO BANNER & CARROUSELS
+     *************************************************************************/
+    function renderFallbackBackdrop(item) {
+      const [c1, c2, accent] = item.palette || PALETTES[0];
+      return `
+        <div class="w-full h-full relative overflow-hidden" style="background: radial-gradient(circle at 72% 35%, ${c1} 0%, ${c2} 65%, #0a0a0a 100%);">
+          <div class="absolute -right-24 -top-24 w-96 h-96 rounded-full blur-3xl opacity-25" style="background:${accent};"></div>
+        </div>
+      `;
+    }
+
+    function renderHero() {
+      const featured = state.catalog.find(i => i.isFeatured) || state.catalog[0];
+      if (!featured) return;
+      state.heroItem = featured;
+
+      const bgUrl = featured.posterHorizontalUrl || featured.posterVerticalUrl;
+      document.getElementById("hero-backdrop").innerHTML = bgUrl
+        ? `<img src="${bgUrl}" alt="${featured.title}" class="w-full h-full object-cover object-center" />`
+        : renderFallbackBackdrop(featured);
+
+      document.getElementById("hero-badge-label").textContent = featured.isOriginal
+        ? "UNE PRODUCTION ORIGINALE FLOKS'IX"
+        : featured.category.toUpperCase();
+      document.getElementById("hero-title").textContent = featured.title;
+      document.getElementById("hero-synopsis").textContent = featured.synopsis || "";
+      document.getElementById("hero-meta").innerHTML = `
+        <span class="text-[#46d369] font-bold">Recommandé à 99 %</span>
+        <span class="text-neutral-300">${featured.year}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-xs text-neutral-200 rounded-sm">${featured.rating}</span>
+        <span class="text-neutral-200">${featured.duration}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-400 text-[11px] font-bold text-neutral-200 rounded-sm">4K Ultra HD</span>
+      `;
+    }
+
+    function renderCardInner(item, isVertical) {
+      const imgUrl = isVertical
+        ? (item.posterVerticalUrl || item.posterHorizontalUrl)
+        : (item.posterHorizontalUrl || item.posterVerticalUrl);
+      const [c1, c2, accent] = item.palette || PALETTES[0];
+      const fBadge = item.isOriginal
+        ? `<span class="absolute top-2 left-2.5 z-10 font-display text-xl text-[#E50914] drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] leading-none">F</span>`
+        : "";
+
+      if (imgUrl) {
+        return `
+          <img src="${imgUrl}" alt="${item.title}" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+          ${fBadge}
+          <div class="absolute bottom-2 left-2.5 right-2.5 z-10">
+            <div class="font-display ${isVertical ? "text-xl" : "text-lg"} text-white leading-tight drop-shadow truncate">${item.title}</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="w-full h-full relative p-3 flex flex-col justify-end" style="background: linear-gradient(155deg, ${c1} 0%, ${c2} 75%, #090909 100%);">
+          ${fBadge}
+          <div class="text-[10px] uppercase tracking-widest font-semibold mb-1" style="color:${accent}">${item.category}</div>
+          <div class="font-display ${isVertical ? "text-2xl" : "text-xl"} text-white leading-tight drop-shadow">${item.title}</div>
+        </div>
+      `;
+    }
+
+    function renderRows() {
+      const container = document.getElementById("rows-container");
+      container.innerHTML = "";
+      const q = state.searchQuery.trim().toLowerCase();
+
+      const filtered = state.catalog.filter(item => {
+        if (q && !item.title.toLowerCase().includes(q) && !item.category.toLowerCase().includes(q) && !(item.synopsis || "").toLowerCase().includes(q)) {
+          return false;
+        }
+        if (state.filter === "ORIGINALS") return item.isOriginal;
+        if (state.filter !== "ALL") return item.category === state.filter;
+        return true;
+      });
+
+      const rows = [];
+      const originals = filtered.filter(i => i.isOriginal);
+      if (originals.length > 0 && (state.filter === "ALL" || state.filter === "ORIGINALS")) {
+        rows.push({ title: "ORIGINALS FLOKS'IX", isVertical: true, items: originals });
+      }
+
+      if (state.filter !== "ORIGINALS") {
+        const categories = [...new Set(filtered.map(i => i.category))];
+        categories.forEach(cat => {
+          const items = filtered.filter(i => i.category === cat);
+          if (items.length > 0) rows.push({ title: cat, isVertical: false, items });
+        });
+      }
+
+      state.renderedRows = rows;
+
+      if (rows.length === 0) {
+        container.innerHTML = `<div class="px-5 sm:px-12 py-12 text-neutral-400 text-sm">Aucun titre ne correspond à cette recherche.</div>`;
+        return;
+      }
+
+      rows.forEach((row, rIdx) => {
+        const sec = document.createElement("div");
+        sec.innerHTML = `
+          <h2 class="px-5 sm:px-12 text-lg sm:text-xl font-bold text-neutral-100 mb-3 tracking-wide flex items-center gap-2">
+            ${row.isVertical ? `<span class="text-[#E50914] font-display text-2xl leading-none">F</span>` : ""}
+            <span>${row.title}</span>
+          </h2>
+          <div class="row-track flex items-center gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar px-5 sm:px-12 py-3 scroll-smooth"></div>
+        `;
+        const track = sec.querySelector(".row-track");
+
+        row.items.forEach((item, cIdx) => {
+          const card = document.createElement("button");
+          card.className = row.isVertical
+            ? "carousel-card poster-card shrink-0 w-36 sm:w-44 aspect-[2/3] rounded-md overflow-hidden relative shadow-xl bg-[#181818] focus:outline-none text-left"
+            : "carousel-card poster-card shrink-0 w-56 sm:w-64 aspect-video rounded-md overflow-hidden relative shadow-xl bg-[#181818] focus:outline-none text-left";
+          card.dataset.row = rIdx;
+          card.dataset.col = cIdx;
+          card.innerHTML = renderCardInner(item, row.isVertical);
+          card.onclick = () => openDetailModal(item);
+          track.appendChild(card);
+        });
+
+        container.appendChild(sec);
+      });
+    }
+
+    function renderAll() {
+      renderHero();
+      renderRows();
+    }
+
+    /*************************************************************************
+     * MODALE DÉTAIL & LECTEUR VIDÉO
+     *************************************************************************/
+    function openDetailModal(item) {
+      state.detailItem = item;
+      const bgUrl = item.posterHorizontalUrl || item.posterVerticalUrl;
+      document.getElementById("detail-backdrop").innerHTML = bgUrl
+        ? `<img src="${bgUrl}" alt="${item.title}" class="w-full h-full object-cover" />`
+        : renderFallbackBackdrop(item);
+      document.getElementById("detail-original-badge").classList.toggle("hidden", !item.isOriginal);
+      document.getElementById("detail-title").textContent = item.title;
+      document.getElementById("detail-synopsis").textContent = item.synopsis || "Aucun synopsis.";
+      document.getElementById("detail-meta").innerHTML = `
+        <span class="text-[#46d369] font-bold">Recommandé à 98 %</span>
+        <span class="text-neutral-300">${item.year}</span>
+        <span class="px-1.5 py-0.5 border border-neutral-500 text-xs rounded-sm">${item.rating}</span>
+        <span class="text-neutral-300">${item.duration}</span>
+        <span class="text-neutral-400">• ${item.category}</span>
+      `;
+      document.getElementById("modal-detail").classList.remove("hidden");
+    }
+
+    function closeDetailModal() {
+      document.getElementById("modal-detail").classList.add("hidden");
+    }
+
+    function openPlayer(item) {
+      closeDetailModal();
+      document.getElementById("player-title").textContent = item.title;
+      const video = document.getElementById("video-element");
+      const emptyMsg = document.getElementById("player-empty-msg");
+
+      if (item.videoUrl) {
+        emptyMsg.classList.add("hidden");
+        video.classList.remove("hidden");
+        video.src = item.videoUrl;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.removeAttribute("src");
+        video.classList.add("hidden");
+        emptyMsg.classList.remove("hidden");
+      }
+      document.getElementById("modal-player").classList.remove("hidden");
+    }
+
+    function closePlayer() {
+      const video = document.getElementById("video-element");
+      video.pause();
+      video.removeAttribute("src");
+      document.getElementById("modal-player").classList.add("hidden");
+    }
+
+    /*************************************************************************
+     * CODE PIN ADMIN (9999)
+     *************************************************************************/
+    const KEYPAD = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✕"];
+
+    function openPinModal() {
+      state.pinInput = "";
+      document.getElementById("pin-error").textContent = "";
+      const keypad = document.getElementById("pin-keypad");
+      keypad.innerHTML = "";
+      KEYPAD.forEach(k => {
+        const b = document.createElement("button");
+        b.className = "h-12 rounded-lg bg-[#262626] hover:bg-neutral-700 text-white text-lg font-bold transition";
+        b.textContent = k;
+        b.onclick = () => handlePinKey(k);
+        keypad.appendChild(b);
+      });
+      updatePinBoxes();
+      document.getElementById("modal-pin").classList.remove("hidden");
+    }
+
+    function closePinModal() {
+      document.getElementById("modal-pin").classList.add("hidden");
+    }
+
+    function handlePinKey(k) {
+      if (k === "✕") { closePinModal(); return; }
+      if (k === "⌫") { state.pinInput = state.pinInput.slice(0, -1); updatePinBoxes(); return; }
+      if (/^\d$/.test(k) && state.pinInput.length < 4) {
+        state.pinInput += k;
+        updatePinBoxes();
+        if (state.pinInput.length === 4) {
+          if (state.pinInput === ADMIN_PIN) {
+            closePinModal();
+            openAdminStudio();
+          } else {
+            document.getElementById("pin-error").textContent = "Code PIN incorrect.";
+            const boxes = document.getElementById("pin-boxes");
+            boxes.classList.remove("animate-shake");
+            void boxes.offsetWidth;
+            boxes.classList.add("animate-shake");
+            setTimeout(() => { state.pinInput = ""; updatePinBoxes(); }, 420);
+          }
+        }
+      }
+    }
+
+    function updatePinBoxes() {
+      document.querySelectorAll(".pin-box").forEach((box, i) => {
+        box.textContent = i < state.pinInput.length ? "•" : "";
+        box.classList.toggle("border-[#E50914]", i === state.pinInput.length);
+        box.classList.toggle("border-white", i < state.pinInput.length);
+        box.classList.toggle("border-neutral-600", i > state.pinInput.length);
+      });
+    }
+
+    /*************************************************************************
+     * STUDIO ADMIN (2 COLONNES + DOUBLE UPLOAD CORRIGÉ)
+     *************************************************************************/
+    function openAdminStudio() {
+      document.getElementById("screen-admin").classList.remove("hidden");
+      renderAdminList();
+      resetAdminForm();
+    }
+
+    function closeAdminStudio() {
+      document.getElementById("screen-admin").classList.add("hidden");
+    }
+
+    function renderAdminList() {
+      document.getElementById("admin-count").textContent = state.catalog.length;
+      const list = document.getElementById("admin-list");
+      list.innerHTML = "";
+      const currentId = document.getElementById("field-id").value;
+
+      state.catalog.forEach(item => {
+        const thumb = item.posterVerticalUrl || item.posterHorizontalUrl;
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = `w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition border ${
+          item.id === currentId ? "bg-[#E50914]/20 border-[#E50914]" : "bg-[#1e1e1e] hover:bg-[#262626] border-white/5"
+        }`;
+        row.innerHTML = `
+          <div class="w-10 h-14 rounded overflow-hidden bg-black shrink-0 flex items-center justify-center border border-white/10">
+            ${thumb ? `<img src="${thumb}" class="w-full h-full object-cover" />` : `<span class="font-display text-lg text-[#E50914]">F</span>`}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-bold text-sm text-white truncate">${item.title}</span>
+              ${item.isFeatured ? `<span class="bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded">★ VEDETTE</span>` : ""}
+            </div>
+            <div class="text-[11px] text-neutral-400 truncate">${item.category} • ${item.year}</div>
+          </div>
+        `;
+        row.onclick = () => loadItemIntoForm(item);
+        list.appendChild(row);
+      });
+    }
+
+    function updatePreview(previewId, url, placeholderText) {
+      const box = document.getElementById(previewId);
+      box.innerHTML = url
+        ? `<img src="${url}" class="w-full h-full object-cover" />`
+        : `<span class="text-[11px] text-neutral-500 px-2">${placeholderText}</span>`;
+    }
+
+    function resetAdminForm() {
+      document.getElementById("form-heading").textContent = "Nouveau titre";
+      document.getElementById("btn-delete-item").classList.add("hidden");
+      document.getElementById("field-id").value = "";
+      document.getElementById("field-title").value = "";
+      document.getElementById("field-category").value = "Tendances actuelles";
+      document.getElementById("field-year").value = 2026;
+      document.getElementById("field-duration").value = "1 h 45 min";
+      document.getElementById("field-rating").value = "16+";
+      document.getElementById("field-synopsis").value = "";
+      document.getElementById("field-featured").checked = false;
+      document.getElementById("field-original").checked = true;
+      document.getElementById("field-poster-vertical").value = "";
+      document.getElementById("field-poster-horizontal").value = "";
+      document.getElementById("field-video-url").value = "";
+      document.getElementById("status-vertical").textContent = "Cliquer ou glisser une image (2:3)";
+      document.getElementById("status-vertical").className = "text-xs text-neutral-300 font-medium";
+      document.getElementById("status-horizontal").textContent = "Cliquer ou glisser une image (16:9)";
+      document.getElementById("status-horizontal").className = "text-xs text-neutral-300 font-medium";
+      document.getElementById("status-video").textContent = "Cliquer ou glisser un fichier .mp4 pour l'uploader sur R2";
+      document.getElementById("status-video").className = "text-xs text-neutral-300 font-medium";
+      updatePreview("preview-vertical", "", "Format 2:3");
+      updatePreview("preview-horizontal", "", "Format 16:9");
+      renderAdminList();
+    }
+
+    function loadItemIntoForm(item) {
+      document.getElementById("form-heading").textContent = `Modifier : ${item.title}`;
+      document.getElementById("btn-delete-item").classList.remove("hidden");
+      document.getElementById("field-id").value = item.id;
+      document.getElementById("field-title").value = item.title;
+      document.getElementById("field-category").value = item.category;
+      document.getElementById("field-year").value = item.year;
+      document.getElementById("field-duration").value = item.duration;
+      document.getElementById("field-rating").value = item.rating;
+      document.getElementById("field-synopsis").value = item.synopsis || "";
+      document.getElementById("field-featured").checked = Boolean(item.isFeatured);
+      document.getElementById("field-original").checked = Boolean(item.isOriginal);
+      document.getElementById("field-poster-vertical").value = item.posterVerticalUrl || "";
+      document.getElementById("field-poster-horizontal").value = item.posterHorizontalUrl || "";
+      document.getElementById("field-video-url").value = item.videoUrl || "";
+      updatePreview("preview-vertical", item.posterVerticalUrl, "Format 2:3");
+      updatePreview("preview-horizontal", item.posterHorizontalUrl, "Format 16:9");
+      renderAdminList();
+    }
+
+    function setupDropzone(dropzoneId, inputId, type) {
+      const dz = document.getElementById(dropzoneId);
+      const input = document.getElementById(inputId);
+
+      // Clic sur TOUTE la zone (les éléments internes ont pointer-events: none)
+      dz.addEventListener("click", () => input.click());
+
+      input.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+          uploadFileToR2(e.target.files[0], type);
+          input.value = "";
+        }
+      });
+
+      ["dragenter", "dragover"].forEach(ev => {
+        dz.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dz.classList.add("dropzone-active");
+        });
+      });
+
+      ["dragleave", "drop"].forEach(ev => {
+        dz.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dz.classList.remove("dropzone-active");
+        });
+      });
+
+      dz.addEventListener("drop", (e) => {
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) uploadFileToR2(file, type);
+      });
+    }
+
+    /*************************************************************************
+     * ÉVÉNEMENTS & NAVIGATION CLAVIER / FIRE TV
+     *************************************************************************/
+    function finishSplash() {
+      const sp = document.getElementById("screen-splash");
+      if (sp.classList.contains("hidden")) return;
+      sp.style.transition = "opacity 0.4s ease";
+      sp.style.opacity = "0";
+      setTimeout(() => sp.classList.add("hidden"), 400);
+    }
+
+    document.getElementById("screen-splash").addEventListener("click", () => { playTudum(true); finishSplash(); });
+    document.getElementById("btn-tudum-replay").addEventListener("click", () => playTudum(true));
+    document.getElementById("btn-open-admin-pin").addEventListener("click", openPinModal);
+    document.getElementById("pin-cancel-btn").addEventListener("click", closePinModal);
+    document.getElementById("admin-close-btn").addEventListener("click", closeAdminStudio);
+    document.getElementById("admin-add-btn").addEventListener("click", resetAdminForm);
+    document.getElementById("admin-new-top-btn").addEventListener("click", resetAdminForm);
+
+    document.getElementById("hero-play-btn").addEventListener("click", () => state.heroItem && openPlayer(state.heroItem));
+    document.getElementById("hero-info-btn").addEventListener("click", () => state.heroItem && openDetailModal(state.heroItem));
+    document.getElementById("detail-close-btn").addEventListener("click", closeDetailModal);
+    document.getElementById("modal-detail").addEventListener("click", (e) => { if (e.target.id === "modal-detail") closeDetailModal(); });
+    document.getElementById("detail-play-btn").addEventListener("click", () => state.detailItem && openPlayer(state.detailItem));
+    document.getElementById("player-close-btn").addEventListener("click", closePlayer);
+    document.getElementById("player-empty-close").addEventListener("click", closePlayer);
+
+    document.querySelectorAll(".nav-filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.filter = btn.dataset.filter;
+        document.querySelectorAll(".nav-filter-btn").forEach(b => b.classList.toggle("text-white", b === btn));
+        renderRows();
+      });
+    });
+
+    document.getElementById("nav-logo-btn").addEventListener("click", () => {
+      state.filter = "ALL";
+      state.searchQuery = "";
+      document.getElementById("quick-search").value = "";
+      renderRows();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("quick-search").addEventListener("input", (e) => {
+      state.searchQuery = e.target.value;
+      renderRows();
+    });
+
+    document.getElementById("field-poster-vertical").addEventListener("input", (e) => {
+      updatePreview("preview-vertical", e.target.value.trim(), "Format 2:3");
+    });
+    document.getElementById("field-poster-horizontal").addEventListener("input", (e) => {
+      updatePreview("preview-horizontal", e.target.value.trim(), "Format 16:9");
+    });
+
+    document.getElementById("admin-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("field-id").value;
+      const title = document.getElementById("field-title").value.trim().toUpperCase();
+      if (!title) return;
+
+      const isFeatured = document.getElementById("field-featured").checked;
+      if (isFeatured) {
+        state.catalog.forEach(item => { item.isFeatured = false; });
+      }
+
+      const payload = {
+        id: id || `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now().toString().slice(-4)}`,
+        title,
+        category: document.getElementById("field-category").value,
+        year: parseInt(document.getElementById("field-year").value, 10) || 2026,
+        duration: document.getElementById("field-duration").value.trim() || "1 h 45 min",
+        rating: document.getElementById("field-rating").value,
+        synopsis: document.getElementById("field-synopsis").value.trim(),
+        isFeatured,
+        isOriginal: document.getElementById("field-original").checked,
+        posterVerticalUrl: document.getElementById("field-poster-vertical").value.trim(),
+        posterHorizontalUrl: document.getElementById("field-poster-horizontal").value.trim(),
+        videoUrl: document.getElementById("field-video-url").value.trim(),
+        palette: PALETTES[Math.floor(Math.random() * PALETTES.length)]
+      };
+
+      const idx = state.catalog.findIndex(x => x.id === payload.id);
+      if (idx !== -1) state.catalog[idx] = { ...state.catalog[idx], ...payload };
+      else state.catalog.unshift(payload);
+
+      document.getElementById("field-id").value = payload.id;
+      await saveCatalogToR2();
+    });
+
+    document.getElementById("btn-delete-item").addEventListener("click", async () => {
+      const id = document.getElementById("field-id").value;
+      if (!id) return;
+      state.catalog = state.catalog.filter(x => x.id !== id);
+      resetAdminForm();
+      await saveCatalogToR2();
+    });
+
+    // Navigation Fire TV / Clavier + raccourci "9999" partout
+    document.addEventListener("keydown", (e) => {
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(tag);
+
+      const pinOpen = !document.getElementById("modal-pin").classList.contains("hidden");
+      const adminOpen = !document.getElementById("screen-admin").classList.contains("hidden");
+      const detailOpen = !document.getElementById("modal-detail").classList.contains("hidden");
+      const playerOpen = !document.getElementById("modal-player").classList.contains("hidden");
+
+      if (pinOpen) {
+        if (/^\d$/.test(e.key)) handlePinKey(e.key);
+        else if (e.key === "Backspace") handlePinKey("⌫");
+        else if (e.key === "Escape") closePinModal();
+        return;
+      }
+
+      if (e.key === "Escape") {
+        if (playerOpen) { closePlayer(); return; }
+        if (detailOpen) { closeDetailModal(); return; }
+        if (adminOpen && !isTyping) { closeAdminStudio(); return; }
+      }
+
+      if (adminOpen || isTyping) return;
+
+      // Taper "9999" n'importe où ouvre la modale PIN / Admin
+      if (/^\d$/.test(e.key)) {
+        state.secretKeyBuffer = (state.secretKeyBuffer + e.key).slice(-4);
+        if (state.secretKeyBuffer === ADMIN_PIN) {
+          state.secretKeyBuffer = "";
+          openAdminStudio();
+          return;
+        }
+      }
+
+      if (playerOpen || detailOpen) return;
+
+      // Navigation D-Pad basique sur l'accueil
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter"].includes(e.key)) {
+        e.preventDefault();
+        updateDpadNavigation(e.key);
+      }
+    });
+
+    function updateDpadNavigation(key) {
+      document.querySelectorAll(".tv-focus, .tv-focus-btn").forEach(el => el.classList.remove("tv-focus", "tv-focus-btn"));
+
+      if (state.focusZone === "hero") {
+        if (key === "ArrowRight") state.heroBtnIdx = 1;
+        else if (key === "ArrowLeft") state.heroBtnIdx = 0;
+        else if (key === "ArrowDown" && state.renderedRows.length > 0) {
+          state.focusZone = "rows"; state.rowIdx = 0; state.colIdx = 0;
+        } else if (key === "Enter") {
+          (state.heroBtnIdx === 0 ? document.getElementById("hero-play-btn") : document.getElementById("hero-info-btn")).click();
+          return;
+        }
+      } else if (state.focusZone === "rows") {
+        const curRow = state.renderedRows[state.rowIdx];
+        if (key === "ArrowRight" && curRow && state.colIdx < curRow.items.length - 1) state.colIdx++;
+        else if (key === "ArrowLeft" && state.colIdx > 0) state.colIdx--;
+        else if (key === "ArrowDown" && state.rowIdx < state.renderedRows.length - 1) {
+          state.rowIdx++;
+          state.colIdx = Math.min(state.colIdx, state.renderedRows[state.rowIdx].items.length - 1);
+        } else if (key === "ArrowUp") {
+          if (state.rowIdx > 0) {
+            state.rowIdx--;
+            state.colIdx = Math.min(state.colIdx, state.renderedRows[state.rowIdx].items.length - 1);
+          } else {
+            state.focusZone = "hero";
+          }
+        } else if (key === "Enter" && curRow && curRow.items[state.colIdx]) {
+          openDetailModal(curRow.items[state.colIdx]);
+          return;
+        }
+      }
+
+      if (state.focusZone === "hero") {
+        const btn = state.heroBtnIdx === 0 ? document.getElementById("hero-play-btn") : document.getElementById("hero-info-btn");
+        btn.classList.add("tv-focus-btn");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        const card = document.querySelector(`.carousel-card[data-row="${state.rowIdx}"][data-col="${state.colIdx}"]`);
+        if (card) {
+          card.classList.add("tv-focus");
+          card.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
+      }
+    }
+
+    /*************************************************************************
+     * INITIALISATION
+     *************************************************************************/
+    window.addEventListener("load", () => {
+      setupDropzone("dropzone-vertical", "input-file-vertical", "vertical");
+      setupDropzone("dropzone-horizontal", "input-file-horizontal", "horizontal");
+      setupDropzone("dropzone-video", "input-file-video", "video");
+      fetchCatalog();
+      setTimeout(finishSplash, 3000);
+    });
+  </script>
+</body>
+</html>
